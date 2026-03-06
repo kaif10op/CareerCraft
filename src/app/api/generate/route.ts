@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     if (error) {
       console.error("Supabase error:", error);
       return NextResponse.json(
-        { error: "Failed to save resume" },
+        { error: `Failed to save resume: ${error.message} \nDetails: ${error.details}\nHint: ${error.hint}` },
         { status: 500 }
       );
     }

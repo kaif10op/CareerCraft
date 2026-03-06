@@ -18,8 +18,8 @@ import { StepProjects } from "./wizard/StepProjects";
 import { StepSkills } from "./wizard/StepSkills";
 import { LivePreview } from "./wizard/LivePreview";
 
-const STEPS = [
-  { id: "basics", title: "Basics", fields: ["fullName", "email", "phone", "linkedin", "github", "portfolio", "location", "jobTitle"] },
+const ALL_STEPS = [
+  { id: "basics", title: "Basics", fields: ["fullName", "email", "phone", "linkedin", "github", "portfolio", "location", "jobTitle", "role"] },
   { id: "summary", title: "Summary", fields: ["summary"] },
   { id: "experience", title: "Experience", fields: ["experience"] },
   { id: "education", title: "Education", fields: ["education", "certifications"] },
@@ -36,14 +36,21 @@ export default function ResumeForm() {
   const [apiError, setApiError] = useState("");
   const [isMounted, setIsMounted] = useState(false);
 
-  // Initialize form
   const methods = useForm<ResumeFormValues>({
-    resolver: zodResolver(resumeSchema),
+    resolver: zodResolver(resumeSchema) as any,
     defaultValues,
     mode: "onChange",
   });
 
   const { trigger, handleSubmit, formState: { isValid }, watch, reset } = methods;
+  const role = watch("role") || "professional";
+
+  // For students/freshers, experience is fully optional — don't block on validation
+  const getSteps = () => {
+    return ALL_STEPS;
+  };
+
+  const STEPS = getSteps();
 
   // Load from LocalStorage on mount
   useEffect(() => {
@@ -70,9 +77,32 @@ export default function ResumeForm() {
   }, [watch, isMounted]);
 
   const handleNext = async () => {
-    // Validate current step fields before allowing next
     const currentFields = STEPS[currentStep].fields;
-    // We explicitly cast to any here to satisfy RHF trigger signature for array fields
+    const currentStepId = STEPS[currentStep].id;
+
+    // For students/freshers, skip validation on experience and education steps
+    const isOptionalStep =
+      (role === "student" || role === "fresher") &&
+      (currentStepId === "experience" || currentStepId === "education");
+
+    if (isOptionalStep) {
+      // Just move forward without validation
+      if (currentStep < STEPS.length - 1) {
+        setCurrentStep((prev) => prev + 1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
+
+    // For projects step, always skip validation (it's optional for everyone)
+    if (currentStepId === "projects") {
+      if (currentStep < STEPS.length - 1) {
+        setCurrentStep((prev) => prev + 1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
+
     const isStepValid = await trigger(currentFields as any);
 
     if (isStepValid) {
@@ -107,6 +137,9 @@ export default function ResumeForm() {
         throw new Error(resData.error || "Failed to generate resume");
       }
 
+      // Clear localStorage cache after successful generation
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+
       router.push(`/preview/${resData.id}`);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : "Something went wrong");
@@ -119,7 +152,7 @@ export default function ResumeForm() {
   return (
     <FormProvider {...methods}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start relative">
-        
+
         {/* Left Side: The Wizard Form */}
         <div className="flex flex-col h-full bg-gray-950/50 backdrop-blur-xl border border-gray-800 rounded-3xl overflow-hidden shadow-2xl relative min-h-[600px]">
           {/* Decorative top gradient */}
@@ -135,19 +168,27 @@ export default function ResumeForm() {
           >
             <div className="flex-1 p-8 overflow-y-auto custom-scrollbar relative">
               {apiError && (
-                <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm animate-in fade-in duration-300">
+                <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm fade-in">
                   <p className="font-semibold mb-1">Error Generating Resume</p>
                   {apiError}
                 </div>
               )}
 
               <AnimatePresence mode="wait">
-                {currentStep === 0 && <motion.div key="step-1" exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}><StepBasics /></motion.div>}
-                {currentStep === 1 && <motion.div key="step-2" exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}><StepSummary /></motion.div>}
-                {currentStep === 2 && <motion.div key="step-3" exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}><StepExperience /></motion.div>}
-                {currentStep === 3 && <motion.div key="step-4" exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}><StepEducation /></motion.div>}
-                {currentStep === 4 && <motion.div key="step-5" exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}><StepProjects /></motion.div>}
-                {currentStep === 5 && <motion.div key="step-6" exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}><StepSkills /></motion.div>}
+                <motion.div
+                  key={`step-${currentStep}`}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                >
+                  {currentStep === 0 && <StepBasics />}
+                  {currentStep === 1 && <StepSummary />}
+                  {currentStep === 2 && <StepExperience />}
+                  {currentStep === 3 && <StepEducation />}
+                  {currentStep === 4 && <StepProjects />}
+                  {currentStep === 5 && <StepSkills />}
+                </motion.div>
               </AnimatePresence>
             </div>
 
@@ -165,7 +206,7 @@ export default function ResumeForm() {
               {isLastStep ? (
                 <button
                   type="submit"
-                  disabled={isGenerating || !isValid}
+                  disabled={isGenerating}
                   className="group relative flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-semibold shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {isGenerating ? (
@@ -196,7 +237,7 @@ export default function ResumeForm() {
 
         {/* Right Side: Live Preview (Hidden on mobile) */}
         <div className="hidden lg:block h-full min-h-[600px] max-h-[85vh] sticky top-24">
-           <LivePreview />
+          <LivePreview />
         </div>
 
       </div>

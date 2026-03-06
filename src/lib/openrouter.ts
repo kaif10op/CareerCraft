@@ -17,7 +17,7 @@ const providers: AIProvider[] = [
       "HTTP-Referer": "https://ai-resume-builder.vercel.app",
       "X-Title": "AI Resume Builder",
     }),
-    model: "meta-llama/llama-4-maverick:free",
+    model: "google/gemini-2.5-pro",
   },
   {
     name: "Groq",
@@ -26,24 +26,24 @@ const providers: AIProvider[] = [
       Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       "Content-Type": "application/json",
     }),
-    model: "llama-3.3-70b-versatile",
+    model: "llama3-8b-8192",
   },
 ];
 
 function buildPrompt(input: ResumeInput): string {
-  const educationText = input.education
-    .map(
-      (e) =>
-        `- ${e.degree} in ${e.field} from ${e.institution} (${e.startYear} - ${e.endYear})`
-    )
-    .join("\n");
+  const role = (input as any).role || "professional";
 
-  const experienceText = input.experience
-    .map(
-      (e) =>
-        `- ${e.position} at ${e.company} (${e.startDate} - ${e.endDate}): ${e.description}`
-    )
-    .join("\n");
+  const educationText = input.education && input.education.length > 0
+    ? input.education
+        .map((e) => `- ${e.degree} in ${e.field} from ${e.institution} (${e.startYear} - ${e.endYear})`)
+        .join("\n")
+    : "None provided.";
+
+  const experienceText = input.experience && input.experience.length > 0
+    ? input.experience
+        .map((e) => `- ${e.position} at ${e.company} (${e.startDate} - ${e.endDate}): ${e.description}`)
+        .join("\n")
+    : "None provided.";
 
   const projectsText = input.projects && input.projects.length > 0
     ? input.projects.map(
@@ -59,15 +59,38 @@ function buildPrompt(input: ResumeInput): string {
 
   const skillsText = input.skills.join(", ");
 
+  // Role-specific instructions
+  let roleInstructions = "";
+  switch (role) {
+    case "student":
+      roleInstructions = `This person is a STUDENT. Emphasize education, academic projects, coursework, and skills over work experience. If no work experience is provided, focus heavily on projects, academic achievements, and extracurricular activities. Use language appropriate for early-career candidates.`;
+      break;
+    case "fresher":
+      roleInstructions = `This person is a FRESHER / NEW GRADUATE. Emphasize education, projects, internships, and transferable skills. If work experience is limited, highlight projects and technical skills prominently. Use enthusiastic, growth-oriented language.`;
+      break;
+    case "freelancer":
+      roleInstructions = `This person is a FREELANCER. Present their experience as client projects and independent work. Emphasize versatility, self-management, and diverse skill sets. Frame work history as engagements/contracts rather than traditional employment.`;
+      break;
+    case "career_changer":
+      roleInstructions = `This person is a CAREER CHANGER. Emphasize transferable skills, relevant projects, and coursework/certifications in their new field. Downplay irrelevant past experience while highlighting adaptability and passion for the new career direction.`;
+      break;
+    default:
+      roleInstructions = `This person is an experienced PROFESSIONAL. Create a traditional, polished resume emphasizing career progression, impact metrics, and leadership.`;
+  }
+
   return `You are a professional resume writer. Generate a polished, ATS-friendly professional resume in clean Markdown format for the following person. Make it impressive, well-structured, and ready to use. Use proper sections with headers. Do NOT include any explanations or notes — only output the resume content.
+
+${roleInstructions}
+
+IMPORTANT: Only include sections that have content. If a section has "None provided", skip it entirely — do NOT add placeholder text.
 
 **Personal Information:**
 - Name: ${input.fullName}
 ${input.jobTitle ? `- Professional Title: ${input.jobTitle}` : ""}
 - Email: ${input.email}
-- Phone: ${input.phone}
+${input.phone ? `- Phone: ${input.phone}` : ""}
 ${input.location ? `- Location: ${input.location}` : ""}
-- LinkedIn: ${input.linkedin}
+${input.linkedin ? `- LinkedIn: ${input.linkedin}` : ""}
 ${input.github ? `- GitHub: ${input.github}` : ""}
 ${input.portfolio ? `- Portfolio: ${input.portfolio}` : ""}
 
@@ -89,7 +112,7 @@ ${certsText}
 **Skills:**
 ${skillsText}
 
-Generate a complete, professional resume in Markdown format. Include proper formatting with headers (##), bullet points, and clean spacing. Make it ATS-optimized, modern, and impressive.`;
+Generate a complete, professional resume in Markdown format. Include proper formatting with headers (##), bullet points, and clean spacing. Make it ATS-optimized, modern, and impressive. Adapt the tone and structure for the candidate's profile type.`;
 }
 
 export async function generateResume(input: ResumeInput): Promise<string> {

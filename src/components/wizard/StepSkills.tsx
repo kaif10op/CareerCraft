@@ -1,7 +1,9 @@
+"use client";
+
 import React, { KeyboardEvent, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { ResumeFormValues } from "@/lib/schema";
-import { X, Code2 } from "lucide-react";
+import { X, Code2, Sparkles, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function StepSkills() {
@@ -12,13 +14,18 @@ export function StepSkills() {
   } = useFormContext<ResumeFormValues>();
 
   const skills = watch("skills") || [];
+  const jobTitle = watch("jobTitle") || "";
+  const role = watch("role") || "professional";
+  const experience = watch("experience") || [];
   const [inputValue, setInputValue] = useState("");
+  const [isAILoading, setIsAILoading] = useState(false);
+  const [aiError, setAiError] = useState("");
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
       const newSkill = inputValue.trim();
-      
+
       if (newSkill && !skills.includes(newSkill)) {
         setValue("skills", [...skills, newSkill], { shouldValidate: true });
       }
@@ -34,15 +41,62 @@ export function StepSkills() {
     );
   };
 
+  const handleAISuggest = async () => {
+    setIsAILoading(true);
+    setAiError("");
+
+    try {
+      const experienceSummary = experience
+        .map((e) => `${e.position} at ${e.company}`)
+        .join(", ");
+
+      const response = await fetch("/api/ai-assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "skills",
+          context: {
+            jobTitle,
+            role,
+            background: experienceSummary || "No experience provided",
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to suggest skills");
+      }
+
+      // Parse the comma-separated skills and merge with existing
+      const suggestedSkills = data.result
+        .split(",")
+        .map((s: string) => s.trim())
+        .filter((s: string) => s.length > 0 && !skills.includes(s));
+
+      if (suggestedSkills.length > 0) {
+        setValue("skills", [...skills, ...suggestedSkills], { shouldValidate: true });
+      }
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "AI suggest failed");
+    } finally {
+      setIsAILoading(false);
+    }
+  };
+
   return (
-    <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
+    <div className="space-y-6 animate-in slide-in-from-right-4 fade-in">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Technical Skills</h2>
-        <p className="text-gray-400 text-sm mb-6">Type a skill and press <kbd className="bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5 mx-1 font-mono text-xs text-gray-300">Enter</kbd> or <kbd className="bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5 mx-1 font-mono text-xs text-gray-300">,</kbd> to add it.</p>
+        <p className="text-gray-400 text-sm mb-6">
+          Type a skill and press <kbd className="bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5 mx-1 font-mono text-xs text-gray-300">Enter</kbd> or{" "}
+          <kbd className="bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5 mx-1 font-mono text-xs text-gray-300">,</kbd> to add it, or let AI suggest skills for you!
+        </p>
       </div>
 
       <div className="bg-gray-900/50 border border-gray-700/50 rounded-2xl p-6">
-        <div className="relative mb-6">
+        <div className="relative mb-4">
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
             <Code2 className="w-5 h-5" />
           </div>
@@ -56,16 +110,42 @@ export function StepSkills() {
           />
         </div>
 
+        {/* AI Suggest Button */}
+        <button
+          type="button"
+          disabled={isAILoading}
+          onClick={handleAISuggest}
+          className="ai-btn mb-4 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600/20 to-purple-600/20 text-violet-300 border border-violet-500/40 hover:border-violet-400 hover:text-white text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-violet-500/10"
+        >
+          {isAILoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Suggesting...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4" />
+              ✨ Suggest Skills with AI
+            </>
+          )}
+        </button>
+
+        {aiError && (
+          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-sm">
+            {aiError}
+          </div>
+        )}
+
         {errors.skills?.message && typeof errors.skills.message === 'string' && (
           <p className="text-red-400 text-sm mb-4 bg-red-500/10 p-3 rounded-lg border border-red-500/20 inline-block">{errors.skills.message}</p>
         )}
 
         <div className="min-h-[200px] border-t border-gray-800 pt-6 mt-2">
           {skills.length === 0 ? (
-             <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-2 mt-8">
-               <Code2 className="w-10 h-10 opacity-20" />
-               <p>No skills added yet.</p>
-             </div>
+            <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-2 mt-8">
+              <Code2 className="w-10 h-10 opacity-20" />
+              <p>No skills added yet. Type above or click &quot;Suggest Skills with AI&quot;.</p>
+            </div>
           ) : (
             <div className="flex flex-wrap gap-2">
               <AnimatePresence>

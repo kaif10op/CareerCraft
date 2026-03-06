@@ -16,7 +16,78 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
+/* ─── Custom Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInFromRight {
+  from { opacity: 0; transform: translateX(1rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInFromBottom {
+  from { opacity: 0; transform: translateY(0.5rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-size: 200% 200%;
+    background-position: left center;
+  }
+  50% {
+    background-size: 200% 200%;
+    background-position: right center;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.3); }
+  50% { box-shadow: 0 0 16px 4px rgba(139, 92, 246, 0.15); }
+}
+
+.animate-in {
+  animation: fadeIn 0.4s ease-out both;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out both;
+}
+
+.slide-in-from-right-4 {
+  animation: slideInFromRight 0.4s ease-out both;
+}
+
+.slide-in-from-bottom {
+  animation: slideInFromBottom 0.4s ease-out both;
+}
+
+.animate-gradient {
+  animation: gradient-shift 3s ease infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.delay-1000 {
+  animation-delay: 1s;
+}
+
+/* ─── Custom Scrollbar ─── */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -34,28 +105,24 @@ body {
   background: #555;
 }
 
-/* Gradient text animation */
-@keyframes gradient-shift {
-  0%, 100% {
-    background-size: 200% 200%;
-    background-position: left center;
-  }
-  50% {
-    background-size: 200% 200%;
-    background-position: right center;
-  }
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
 }
 
-.animate-gradient {
-  animation: gradient-shift 3s ease infinite;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-/* Delay utility for animations */
-.delay-1000 {
-  animation-delay: 1s;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #2a2a3a;
+  border-radius: 3px;
 }
 
-/* Resume preview prose styles */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* ─── Resume Preview Prose ─── */
 .resume-preview h1 {
   font-size: 1.5rem;
   font-weight: 700;
@@ -119,7 +186,26 @@ body {
   margin: 1rem 0;
 }
 
-/* Print styles */
+/* ─── AI Assist Button Pulse ─── */
+.ai-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.15), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+
+.ai-btn:hover::before {
+  transform: translateX(100%);
+}
+
+/* ─── Print Styles ─── */
 @media print {
   body {
     background: white !important;

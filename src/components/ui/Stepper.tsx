@@ -20,7 +20,7 @@ export function Stepper({ steps, currentStep }: StepperProps) {
           className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-violet-600 to-cyan-500 -translate-y-1/2 rounded-full z-0"
           initial={{ width: "0%" }}
           animate={{
-            width: \`\${(currentStep / (steps.length - 1)) * 100}%\`,
+            width: `${(currentStep / (steps.length - 1)) * 100}%`,
           }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
         />

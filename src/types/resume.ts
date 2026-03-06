@@ -29,17 +29,18 @@ export interface Certification {
 }
 
 export interface ResumeInput {
+  role?: string;
   fullName: string;
   jobTitle?: string;
   email: string;
-  phone: string;
+  phone?: string;
   location?: string;
-  linkedin: string;
+  linkedin?: string;
   github?: string;
   portfolio?: string;
   summary: string;
-  education: Education[];
-  experience: Experience[];
+  education?: Education[];
+  experience?: Experience[];
   projects?: Project[];
   certifications?: Certification[];
   skills: string[];
@@ -50,14 +51,14 @@ export interface ResumeRecord {
   full_name: string;
   job_title?: string;
   email: string;
-  phone: string;
+  phone?: string;
   location?: string;
-  linkedin: string;
+  linkedin?: string;
   github?: string;
   portfolio?: string;
   summary: string;
-  education: Education[];
-  experience: Experience[];
+  education?: Education[];
+  experience?: Experience[];
   projects?: Project[];
   certifications?: Certification[];
   skills: string[];

@@ -154,11 +154,28 @@ export default function ResumeForm() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start relative">
 
         {/* Left Side: The Wizard Form */}
-        <div className="flex flex-col h-full bg-gray-950/50 backdrop-blur-xl border border-gray-800 rounded-3xl overflow-hidden shadow-2xl relative min-h-[600px]">
+        <div
+          className="flex flex-col h-full rounded-3xl overflow-hidden relative min-h-[600px]"
+          style={{
+            backgroundColor: "rgba(3, 7, 18, 0.5)",
+            backdropFilter: "blur(16px)",
+            border: "1px solid #1f2937",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+          }}
+        >
           {/* Decorative top gradient */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-600 via-purple-500 to-cyan-500" />
+          <div
+            className="absolute top-0 left-0 right-0 h-1"
+            style={{ background: "linear-gradient(to right, #7c3aed, #a855f7, #06b6d4)" }}
+          />
 
-          <div className="px-8 pt-8 pb-4 border-b border-gray-800/50 bg-gray-900/30">
+          <div
+            className="px-8 pt-8 pb-4"
+            style={{
+              borderBottom: "1px solid rgba(31, 41, 55, 0.5)",
+              backgroundColor: "rgba(17, 24, 39, 0.3)",
+            }}
+          >
             <Stepper steps={STEPS} currentStep={currentStep} />
           </div>
 
@@ -192,12 +209,19 @@ export default function ResumeForm() {
               </AnimatePresence>
             </div>
 
-            <div className="p-6 border-t border-gray-800/80 bg-gray-900/50 flex items-center justify-between">
+            <div
+              className="p-6 flex items-center justify-between"
+              style={{
+                borderTop: "1px solid rgba(31, 41, 55, 0.8)",
+                backgroundColor: "rgba(17, 24, 39, 0.5)",
+              }}
+            >
               <button
                 type="button"
                 onClick={handlePrevious}
                 disabled={currentStep === 0 || isGenerating}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl border border-gray-700 text-gray-300 font-medium hover:border-gray-500 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                style={{ border: "1px solid #374151", color: "#d1d5db" }}
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
@@ -207,7 +231,11 @@ export default function ResumeForm() {
                 <button
                   type="submit"
                   disabled={isGenerating}
-                  className="group relative flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-semibold shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="group relative flex items-center gap-2 px-8 py-3 rounded-xl text-white font-semibold transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  style={{
+                    background: "linear-gradient(135deg, #7c3aed, #0891b2)",
+                    boxShadow: "0 4px 14px rgba(139, 92, 246, 0.25)",
+                  }}
                 >
                   {isGenerating ? (
                     <>
@@ -225,7 +253,8 @@ export default function ResumeForm() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="flex items-center gap-2 px-8 py-3 rounded-xl bg-white text-gray-950 font-semibold hover:bg-gray-200 transition-colors"
+                  className="flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-colors"
+                  style={{ backgroundColor: "#ffffff", color: "#030712" }}
                 >
                   Next Step
                   <ArrowRight className="w-4 h-4" />

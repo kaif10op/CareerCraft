@@ -10,14 +10,21 @@ interface StepperProps {
 
 export function Stepper({ steps, currentStep }: StepperProps) {
   return (
-    <div className="w-full py-6">
-      <div className="flex items-center justify-between relative">
+    <div className="w-full">
+      {/* Step circles + progress bar */}
+      <div className="flex items-center justify-between relative mb-2">
         {/* Background Track */}
-        <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-800 -translate-y-1/2 rounded-full z-0" />
+        <div
+          className="absolute top-1/2 left-0 w-full h-1 -translate-y-1/2 rounded-full z-0"
+          style={{ backgroundColor: "#1f2937" }}
+        />
 
         {/* Active Progress Track */}
         <motion.div
-          className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-violet-600 to-cyan-500 -translate-y-1/2 rounded-full z-0"
+          className="absolute top-1/2 left-0 h-1 -translate-y-1/2 rounded-full z-0"
+          style={{
+            background: "linear-gradient(to right, #7c3aed, #06b6d4)",
+          }}
           initial={{ width: "0%" }}
           animate={{
             width: `${(currentStep / (steps.length - 1)) * 100}%`,
@@ -28,7 +35,7 @@ export function Stepper({ steps, currentStep }: StepperProps) {
         {steps.map((step, index) => {
           const isCompleted = currentStep > index;
           const isCurrent = currentStep === index;
-          
+
           return (
             <div key={step.id} className="relative z-10 flex flex-col items-center">
               <motion.div
@@ -38,32 +45,46 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                   borderColor: isCompleted || isCurrent ? "#8b5cf6" : "#374151",
                   scale: isCurrent ? 1.1 : 1,
                 }}
-                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors duration-300 shadow-lg ${
-                  isCurrent ? "shadow-violet-500/30" : ""
-                }`}
+                className="w-8 h-8 rounded-full border-2 flex items-center justify-center"
+                style={{
+                  boxShadow: isCurrent ? "0 4px 14px rgba(139, 92, 246, 0.3)" : "none",
+                }}
               >
                 {isCompleted ? (
                   <Check className="w-4 h-4 text-white" strokeWidth={3} />
                 ) : (
                   <span
-                    className={`text-xs font-bold ${
-                      isCurrent ? "text-white" : "text-gray-400"
-                    }`}
+                    className="text-xs font-bold"
+                    style={{
+                      color: isCurrent ? "#ffffff" : "#9ca3af",
+                    }}
                   >
                     {index + 1}
                   </span>
                 )}
               </motion.div>
-
-              {/* Step Title (hidden on small screens, absolute positioning to avoid shifting UI) */}
-              <span
-                className={`absolute top-10 text-xs font-medium whitespace-nowrap hidden sm:block transition-colors duration-300 ${
-                  isCurrent ? "text-violet-300" : isCompleted ? "text-gray-300" : "text-gray-600"
-                }`}
-              >
-                {step.title}
-              </span>
             </div>
+          );
+        })}
+      </div>
+
+      {/* Step labels row — separate from circles */}
+      <div className="flex items-center justify-between">
+        {steps.map((step, index) => {
+          const isCompleted = currentStep > index;
+          const isCurrent = currentStep === index;
+
+          return (
+            <span
+              key={step.id}
+              className="text-xs font-medium text-center hidden sm:block"
+              style={{
+                color: isCurrent ? "#c4b5fd" : isCompleted ? "#d1d5db" : "#4b5563",
+                width: `${100 / steps.length}%`,
+              }}
+            >
+              {step.title}
+            </span>
           );
         })}
       </div>

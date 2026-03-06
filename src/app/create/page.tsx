@@ -7,16 +7,26 @@ export const metadata = {
 
 export default function CreatePage() {
   return (
-    <main className="min-h-screen bg-gray-950 pt-24 pb-16">
+    <main
+      className="min-h-screen pt-28 pb-16"
+      style={{ backgroundColor: "#030712" }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
+          <h1 className="text-4xl font-bold mb-4" style={{ color: "#ffffff" }}>
             Create Your{" "}
-            <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+            <span
+              style={{
+                background: "linear-gradient(to right, #a78bfa, #22d3ee)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
               AI Resume
             </span>
           </h1>
-          <p className="text-gray-400 text-lg">
+          <p className="text-lg" style={{ color: "#9ca3af" }}>
             Fill in your details below and our AI will craft a professional,
             ATS-optimized resume for you.
           </p>

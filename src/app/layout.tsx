@@ -23,7 +23,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased bg-gray-950 text-white`}>
+      <body
+        className={`${inter.variable} antialiased`}
+        style={{
+          fontFamily: "'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif",
+          backgroundColor: "#030712",
+          color: "#ffffff",
+          minHeight: "100vh",
+        }}
+      >
         <Navbar />
         {children}
         <Footer />

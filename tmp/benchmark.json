@@ -1,0 +1,27 @@
+[
+  {
+    "name": "OpenRouter",
+    "success": false,
+    "error": "429 - {\"error\":{\"message\":\"Provider returned error\",\"cod..."
+  },
+  {
+    "name": "Groq",
+    "success": true,
+    "time": "0.55s"
+  },
+  {
+    "name": "Cerebras",
+    "success": true,
+    "time": "0.89s"
+  },
+  {
+    "name": "Gemini",
+    "success": false,
+    "error": "429 - {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Qu..."
+  },
+  {
+    "name": "xAI",
+    "success": false,
+    "error": "403 - {\"code\":\"The caller does not have permission to ex..."
+  }
+]

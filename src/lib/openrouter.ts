@@ -9,15 +9,13 @@ interface AIProvider {
 
 const providers: AIProvider[] = [
   {
-    name: "OpenRouter (Preferred)",
-    url: "https://openrouter.ai/api/v1/chat/completions",
+    name: "Groq",
+    url: "https://api.groq.com/openai/v1/chat/completions",
     getHeaders: () => ({
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": "https://carrier-craft.vercel.app",
-      "X-Title": "Carrier Craft",
     }),
-    model: process.env.AI_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
+    model: "llama-3.1-8b-instant",
   },
   {
     name: "Cerebras",
@@ -29,30 +27,32 @@ const providers: AIProvider[] = [
     model: "llama3.1-8b",
   },
   {
+    name: "Gemini API (Direct)",
+    url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_AI_KEY}`,
+    getHeaders: () => ({
+      "Content-Type": "application/json",
+    }),
+    model: "gemini-2.0-flash",
+  },
+  {
+    name: "OpenRouter (Preferred)",
+    url: "https://openrouter.ai/api/v1/chat/completions",
+    getHeaders: () => ({
+      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": "https://carrier-craft.vercel.app",
+      "X-Title": "Carrier Craft",
+    }),
+    model: process.env.AI_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
+  },
+  {
     name: "xAI (Grok)",
     url: "https://api.x.ai/v1/chat/completions",
     getHeaders: () => ({
       Authorization: `Bearer ${process.env.XAI_API_KEY}`,
       "Content-Type": "application/json",
     }),
-    model: "grok-beta",
-  },
-  {
-    name: "Groq",
-    url: "https://api.groq.com/openai/v1/chat/completions",
-    getHeaders: () => ({
-      Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-      "Content-Type": "application/json",
-    }),
-    model: "llama3-8b-8192",
-  },
-  {
-    name: "Gemini API (Direct)",
-    url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_AI_KEY}`,
-    getHeaders: () => ({
-      "Content-Type": "application/json",
-    }),
-    model: "gemini-2.0-flash", // Handled differently in request builder
+    model: "grok-2-1212",
   },
 ];
 

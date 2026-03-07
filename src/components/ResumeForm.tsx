@@ -176,9 +176,13 @@ export default function ResumeForm() {
           >
             <div className="flex-1 p-8 overflow-y-auto custom-scrollbar relative">
               {apiError && (
-                <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm fade-in">
-                  <p className="font-semibold mb-1">Error Generating Resume</p>
-                  {apiError}
+                <div className="mb-6 p-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm animate-in fade-in slide-in-from-top-2">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <p className="font-bold text-white">Generation Failed</p>
+                  </div>
+                  <p className="opacity-80 leading-relaxed">{apiError}</p>
+                  <p className="mt-3 text-xs text-red-400/60 italic">Tip: Try checking your internet connection or reducing the description length.</p>
                 </div>
               )}
 
@@ -220,12 +224,12 @@ export default function ResumeForm() {
                   {isGenerating ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Generating Magic...
+                      <span>Creating Your Masterpiece...</span>
                     </>
                   ) : (
                     <>
                       <Wand2 className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                      Generate Carrier Craft Resume
+                      <span>Generate AI Resume</span>
                     </>
                   )}
                 </button>

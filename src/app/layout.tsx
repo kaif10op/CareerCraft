@@ -10,10 +10,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI Resume Builder | Create Professional Resumes with AI",
+  title: "Carrier Craft | Create Professional Resumes",
   description:
     "Build stunning, ATS-optimized resumes in seconds using AI. Free, professional, and easy to use.",
-  keywords: ["resume builder", "AI resume", "professional resume", "ATS-friendly"],
+  keywords: ["resume builder", "Carrier Craft", "professional resume", "ATS-friendly"],
 };
 
 export default function RootLayout({
@@ -24,12 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} antialiased`}
+        className={`${inter.variable} antialiased min-h-screen bg-gray-950 text-white print:min-h-0 print:bg-white print:text-black`}
         style={{
           fontFamily: "'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif",
-          backgroundColor: "#030712",
-          color: "#ffffff",
-          minHeight: "100vh",
         }}
       >
         <Navbar />

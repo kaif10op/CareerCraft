@@ -64,4 +64,5 @@ export interface ResumeRecord {
   skills: string[];
   generated_resume: string;
   created_at: string;
+  user_id?: string;
 }

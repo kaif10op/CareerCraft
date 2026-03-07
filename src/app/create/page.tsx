@@ -1,7 +1,7 @@
 import ResumeForm from "@/components/ResumeForm";
 
 export const metadata = {
-  title: "Create Resume | AI Resume Builder",
+  title: "Create Resume | Carrier Craft",
   description: "Enter your details and let AI create a professional resume for you.",
 };
 
@@ -17,13 +17,10 @@ export default function CreatePage() {
             Create Your{" "}
             <span
               style={{
-                background: "linear-gradient(to right, #a78bfa, #22d3ee)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
+                color: "#ffffff",
               }}
             >
-              AI Resume
+              Resume
             </span>
           </h1>
           <p className="text-lg" style={{ color: "#9ca3af" }}>

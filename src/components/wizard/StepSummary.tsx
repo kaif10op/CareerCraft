@@ -56,19 +56,21 @@ export function StepSummary() {
   };
 
   return (
-    <div className="space-y-6 animate-in slide-in-from-right-4 fade-in">
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Professional Summary</h2>
-        <p className="text-gray-400 text-sm mb-6">
+    <div className="space-y-8 animate-in slide-in-from-right-4 fade-in">
+      <div className="pb-3 border-b border-gray-800">
+        <h2 className="text-3xl font-extrabold mb-1 text-white tracking-tight">
+          Professional Summary
+        </h2>
+        <p className="text-base font-medium text-gray-400">
           Write a short, engaging pitch highlighting your expertise and what you bring to the table.
         </p>
       </div>
 
-      <div className="bg-violet-900/20 border border-violet-500/30 rounded-xl p-4 flex gap-3 text-sm text-violet-200 mb-6">
-        <Info className="w-5 h-5 shrink-0 text-violet-400 mt-0.5" />
-        <p>
+      <div className="rounded-2xl p-5 flex gap-4 text-sm mb-8 bg-purple-900/20 border border-purple-500/30 text-purple-200">
+        <Info className="w-6 h-6 shrink-0 text-purple-400" />
+        <p className="leading-relaxed">
           <strong className="text-white">Tip:</strong> Just jot down some rough notes or keywords, then click the{" "}
-          <strong className="text-violet-300">✨ Write with AI</strong> button below and our AI will craft a polished professional summary for you!
+          <strong className="text-purple-300">✨ Write with AI</strong> button below and our AI will craft a polished professional summary for you!
         </p>
       </div>
 
@@ -88,13 +90,17 @@ export function StepSummary() {
         />
 
         {/* Character counter */}
-        <div className={`absolute bottom-3 right-4 text-xs font-medium ${summary.length < 10 ? "text-red-400" : summary.length > 2000 ? "text-red-400" : "text-gray-500"}`}>
+        <div
+          className={`absolute bottom-3 right-4 text-xs font-bold ${
+            summary.length < 10 ? "text-red-400" : summary.length > 2000 ? "text-red-400" : "text-gray-500"
+          }`}
+        >
           {summary.length} / 2000
         </div>
       </div>
 
       {aiError && (
-        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-sm">
+        <div className="p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400">
           {aiError}
         </div>
       )}
@@ -102,17 +108,17 @@ export function StepSummary() {
       <button
         type="button"
         disabled={isAILoading}
-        className="ai-btn flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600/20 to-purple-600/20 text-violet-300 border border-violet-500/40 hover:border-violet-400 hover:text-white text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-violet-500/10"
+        className="ai-btn mt-6 flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-300 border border-violet-500/40 hover:border-violet-400 hover:text-white"
         onClick={handleAIAssist}
       >
         {isAILoading ? (
           <>
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-5 h-5 animate-spin" />
             Writing...
           </>
         ) : (
           <>
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-5 h-5" />
             ✨ Write with AI
           </>
         )}

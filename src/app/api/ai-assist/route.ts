@@ -14,15 +14,33 @@ interface AIProvider {
 
 const providers: AIProvider[] = [
   {
-    name: "OpenRouter",
+    name: "OpenRouter (Preferred)",
     url: "https://openrouter.ai/api/v1/chat/completions",
     getHeaders: () => ({
       Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": "https://ai-resume-builder.vercel.app",
-      "X-Title": "AI Resume Builder",
+      "HTTP-Referer": "https://carrier-craft.vercel.app",
+      "X-Title": "Carrier Craft",
     }),
-    model: "google/gemini-2.5-pro",
+    model: process.env.AI_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
+  },
+  {
+    name: "Cerebras",
+    url: "https://api.cerebras.ai/v1/chat/completions",
+    getHeaders: () => ({
+      Authorization: `Bearer ${process.env.CEREBRAS_API_KEY}`,
+      "Content-Type": "application/json",
+    }),
+    model: "llama3.1-8b",
+  },
+  {
+    name: "xAI (Grok)",
+    url: "https://api.x.ai/v1/chat/completions",
+    getHeaders: () => ({
+      Authorization: `Bearer ${process.env.XAI_API_KEY}`,
+      "Content-Type": "application/json",
+    }),
+    model: "grok-beta",
   },
   {
     name: "Groq",
@@ -32,6 +50,14 @@ const providers: AIProvider[] = [
       "Content-Type": "application/json",
     }),
     model: "llama3-8b-8192",
+  },
+  {
+    name: "Gemini API (Direct)",
+    url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_AI_KEY}`,
+    getHeaders: () => ({
+      "Content-Type": "application/json",
+    }),
+    model: "gemini-2.0-flash",
   },
 ];
 
@@ -92,8 +118,11 @@ export async function POST(request: Request) {
 
     for (const provider of providers) {
       const hasKey =
-        (provider.name === "OpenRouter" && process.env.OPENROUTER_API_KEY && process.env.OPENROUTER_API_KEY !== "your_openrouter_api_key") ||
-        (provider.name === "Groq" && process.env.GROQ_API_KEY && process.env.GROQ_API_KEY !== "your_groq_api_key");
+        (provider.name.includes("OpenRouter") && !!process.env.OPENROUTER_API_KEY) ||
+        (provider.name === "Groq" && !!process.env.GROQ_API_KEY) ||
+        (provider.name.includes("Gemini") && !!process.env.GOOGLE_AI_KEY) ||
+        (provider.name === "Cerebras" && !!process.env.CEREBRAS_API_KEY) ||
+        (provider.name.includes("xAI") && !!process.env.XAI_API_KEY);
 
       if (!hasKey) {
         errors.push(`${provider.name}: No API key configured`);
@@ -101,10 +130,22 @@ export async function POST(request: Request) {
       }
 
       try {
-        const response = await fetch(provider.url, {
-          method: "POST",
-          headers: provider.getHeaders(),
-          body: JSON.stringify({
+        let requestBody;
+        
+        if (provider.name.includes("Gemini API")) {
+          requestBody = JSON.stringify({
+            contents: [{
+              parts: [{
+                text: systemPrompt + "\n\n" + userPrompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 500,
+            }
+          });
+        } else {
+          requestBody = JSON.stringify({
             model: provider.model,
             messages: [
               { role: "system", content: systemPrompt },
@@ -112,7 +153,13 @@ export async function POST(request: Request) {
             ],
             temperature: 0.7,
             max_tokens: 500,
-          }),
+          });
+        }
+
+        const response = await fetch(provider.url, {
+          method: "POST",
+          headers: provider.getHeaders(),
+          body: requestBody,
         });
 
         if (!response.ok) {
@@ -122,7 +169,13 @@ export async function POST(request: Request) {
         }
 
         const data = await response.json();
-        const content = data.choices?.[0]?.message?.content;
+        let content;
+        
+        if (provider.name.includes("Gemini API")) {
+          content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        } else {
+          content = data.choices?.[0]?.message?.content;
+        }
 
         if (!content) {
           errors.push(`${provider.name}: Empty response`);

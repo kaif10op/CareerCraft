@@ -1,49 +1,99 @@
 @import "tailwindcss";
 
 @theme {
+  --color-brand-50: var(--color-gray-50);
+  --color-brand-100: var(--color-gray-100);
+  --color-brand-200: var(--color-gray-200);
+  --color-brand-300: var(--color-gray-300);
+  --color-brand-400: var(--color-gray-400);
+  --color-brand-500: var(--color-gray-500);
+  --color-brand-600: var(--color-gray-600);
+  --color-brand-700: var(--color-gray-700);
+  --color-brand-800: var(--color-gray-800);
+  --color-brand-900: var(--color-gray-900);
+  --color-brand-950: var(--color-gray-950);
+
+  --color-violet-50: var(--color-gray-50);
+  --color-violet-100: var(--color-gray-100);
+  --color-violet-200: var(--color-gray-200);
+  --color-violet-300: var(--color-gray-300);
+  --color-violet-400: var(--color-gray-400);
+  --color-violet-500: var(--color-gray-500);
+  --color-violet-600: var(--color-gray-600);
+  --color-violet-700: var(--color-gray-700);
+  --color-violet-800: var(--color-gray-800);
+  --color-violet-900: var(--color-gray-900);
+  --color-violet-950: var(--color-gray-950);
+
+  --color-cyan-50: var(--color-gray-50);
+  --color-cyan-100: var(--color-gray-100);
+  --color-cyan-200: var(--color-gray-200);
+  --color-cyan-300: var(--color-gray-300);
+  --color-cyan-400: var(--color-gray-400);
+  --color-cyan-500: var(--color-gray-500);
+  --color-cyan-600: var(--color-gray-600);
+  --color-cyan-700: var(--color-gray-700);
+  --color-cyan-800: var(--color-gray-800);
+  --color-cyan-900: var(--color-gray-900);
+  --color-cyan-950: var(--color-gray-950);
+
+  --color-purple-50: var(--color-gray-50);
+  --color-purple-100: var(--color-gray-100);
+  --color-purple-200: var(--color-gray-200);
+  --color-purple-300: var(--color-gray-300);
+  --color-purple-400: var(--color-gray-400);
+  --color-purple-500: var(--color-gray-500);
+  --color-purple-600: var(--color-gray-600);
+  --color-purple-700: var(--color-gray-700);
+  --color-purple-800: var(--color-gray-800);
+  --color-purple-900: var(--color-gray-900);
+  --color-purple-950: var(--color-gray-950);
+  
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --animate-gradient: gradient-shift 3s ease infinite;
+  --animate-shimmer: shimmer 2s infinite;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-blob: blob 7s infinite;
 
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
-  --color-gray-950: #030712;
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-size: 200% 200%;
+      background-position: left center;
+    }
+    50% {
+      background-size: 200% 200%;
+      background-position: right center;
+    }
+  }
 
-  --color-violet-300: #c4b5fd;
-  --color-violet-400: #a78bfa;
-  --color-violet-500: #8b5cf6;
-  --color-violet-600: #7c3aed;
-  --color-violet-900: #4c1d95;
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
 
-  --color-purple-400: #c084fc;
-  --color-purple-500: #a855f7;
-  --color-purple-600: #9333ea;
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(75, 85, 99, 0.3); }
+    50% { box-shadow: 0 0 16px 4px rgba(75, 85, 99, 0.15); }
+  }
 
-  --color-cyan-400: #22d3ee;
-  --color-cyan-500: #06b6d4;
-  --color-cyan-600: #0891b2;
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+  }
 
-  --color-red-300: #fca5a5;
-  --color-red-400: #f87171;
-  --color-red-500: #ef4444;
-
-  --color-green-400: #4ade80;
-
-  --color-white: #ffffff;
-  --color-black: #000000;
+  @keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
 }
 
-/* ─── Base Styles ─── */
+/* Base Styles */
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html {
@@ -51,108 +101,23 @@ html {
 }
 
 body {
-  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #030712;
-  color: #ffffff;
-  min-height: 100vh;
+  background-color: #030712; /* gray-950 */
+  color: #f9fafb; /* gray-50 */
 }
 
-/* ─── Custom Animations ─── */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideInFromRight {
-  from { opacity: 0; transform: translateX(1rem); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes slideInFromBottom {
-  from { opacity: 0; transform: translateY(0.5rem); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideInFromTop {
-  from { opacity: 0; transform: translateY(-0.25rem); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes gradient-shift {
-  0%, 100% {
-    background-size: 200% 200%;
-    background-position: left center;
-  }
-  50% {
-    background-size: 200% 200%;
-    background-position: right center;
-  }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.3); }
-  50% { box-shadow: 0 0 16px 4px rgba(139, 92, 246, 0.15); }
-}
-
-.animate-in {
-  animation: fadeIn 0.4s ease-out both;
-}
-
-.fade-in {
-  animation: fadeIn 0.4s ease-out both;
-}
-
-.slide-in-from-right-4 {
-  animation: slideInFromRight 0.4s ease-out both;
-}
-
-.slide-in-from-bottom {
-  animation: slideInFromBottom 0.4s ease-out both;
-}
-
-.slide-in-from-top-1 {
-  animation: slideInFromTop 0.3s ease-out both;
-}
-
-.animate-gradient {
-  animation: gradient-shift 3s ease infinite;
-}
-
-.animate-shimmer {
-  background: linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.08) 50%, transparent 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.delay-1000 {
-  animation-delay: 1s;
-}
-
-/* ─── Custom Scrollbar ─── */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-track {
   background: #030712;
 }
-
 ::-webkit-scrollbar-thumb {
   background: #374151;
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: #4b5563;
 }
@@ -160,128 +125,69 @@ body {
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #1f2937;
-  border-radius: 3px;
+  border-radius: 4px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #374151;
 }
 
-/* ─── Resume Preview Prose ─── */
-.resume-preview h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 0.25rem;
+.delay-1000 {
+  animation-delay: 1s;
 }
 
-.resume-preview h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #111827;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #c4b5fd;
-}
-
-.resume-preview h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.resume-preview p {
-  color: #374151;
-  line-height: 1.6;
-  margin-bottom: 0.5rem;
-}
-
-.resume-preview ul {
-  list-style-type: disc;
-  margin-left: 1.25rem;
-  margin-bottom: 0.75rem;
-}
-
-.resume-preview li {
-  color: #374151;
-  margin-bottom: 0.25rem;
-  line-height: 1.5;
-}
-
-.resume-preview strong {
-  color: #111827;
-  font-weight: 600;
-}
-
-.resume-preview a {
-  color: #7c3aed;
-  text-decoration: none;
-}
-
-.resume-preview a:hover {
-  text-decoration: underline;
-}
-
-.resume-preview hr {
-  border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 1rem 0;
-}
-
-/* ─── AI Assist Button Pulse ─── */
-.ai-btn {
-  position: relative;
-  overflow: hidden;
-}
-
-.ai-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.15), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.5s;
-}
-
-.ai-btn:hover::before {
-  transform: translateX(100%);
-}
-
-/* ─── Print Styles ─── */
 @media print {
-  body {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  html, body {
     background: white !important;
     color: black !important;
+    /* Prevent printing blank pages at the end */
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
-
-  nav,
-  footer,
-  [data-print-hide] {
+  nav, footer, [data-print-hide] {
     display: none !important;
   }
-
   main {
     padding: 0 !important;
     background: white !important;
+    margin: 0 !important;
   }
-
+  
+  /* Prevent awkward page breaks */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+  
+  p, ul, li {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  /* Ensure the resume container fits nicely */
   #resume-content {
     box-shadow: none !important;
+    padding: 0.5in !important; /* Replace paper margins with container padding */
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    border: none !important;
     border-radius: 0 !important;
-    padding: 1.5rem !important;
   }
+}
 
-  @page {
-    margin: 0.5in;
-  }
+@page {
+  size: auto;
+  margin: 0mm; /* Removes the browser header/footer (date, url) */
 }

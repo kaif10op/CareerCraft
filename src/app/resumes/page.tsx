@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import ResumeCard from "@/components/ResumeCard";
 import { ResumeRecord } from "@/types/resume";
+import { supabase } from "@/lib/supabase";
 import { Plus, Loader2, FileText, AlertCircle } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
 
@@ -15,7 +16,21 @@ export default function ResumesPage() {
   useEffect(() => {
     async function fetchResumes() {
       try {
-        const res = await fetch("/api/resumes");
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        const headers: HeadersInit = {};
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
+        }
+
+        const res = await fetch("/api/resumes", {
+          headers
+        });
+        
+        if (res.status === 401) {
+          throw new Error("Please sign in to view your resumes");
+        }
+        
         if (!res.ok) {
           throw new Error("Failed to fetch resumes");
         }
@@ -47,17 +62,20 @@ export default function ResumesPage() {
   return (
     <main className="min-h-screen bg-gray-950 pt-24 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-6 relative z-10">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">My <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">Resumes</span></h1>
-            <p className="text-gray-400">View and manage all your AI-generated resumes.</p>
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight">My <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">Resumes</span></h1>
+            <p className="text-gray-400 text-lg">View and manage all your AI-generated resumes.</p>
           </div>
           <Link
             href="/create"
-            className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white px-6 py-3 rounded-xl font-medium transition-all hover:scale-105 hover:shadow-lg hover:shadow-violet-500/25 shadow-lg"
+            className="group relative flex items-center gap-2 bg-white text-gray-950 hover:bg-gray-100 px-7 py-3.5 rounded-2xl font-bold transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.15)] overflow-hidden"
           >
-            <Plus className="w-5 h-5" />
-            Create New
+            <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="relative z-10 flex items-center gap-2">
+              <Plus className="w-5 h-5" />
+              Create New
+            </span>
           </Link>
         </div>
 
@@ -76,19 +94,26 @@ export default function ResumesPage() {
             </div>
           </div>
         ) : resumes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 px-4 text-center border-2 border-dashed border-gray-800 rounded-3xl bg-gray-900/30 max-w-3xl mx-auto backdrop-blur-sm">
-            <div className="w-24 h-24 bg-gray-800/80 rounded-full flex items-center justify-center mb-6 shadow-inner ring-4 ring-gray-900">
-               <FileText className="w-10 h-10 text-gray-500" />
+          <div className="relative group flex flex-col items-center justify-center py-24 px-4 text-center rounded-[2rem] bg-white/[0.01] border border-white/5 max-w-3xl mx-auto backdrop-blur-xl shadow-2xl overflow-hidden hover:border-white/10 transition-colors">
+            {/* Ambient background glows for empty state */}
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-violet-500/10 rounded-full blur-[80px] pointer-events-none group-hover:bg-violet-500/20 transition-colors duration-700" />
+            <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px] pointer-events-none group-hover:bg-cyan-500/20 transition-colors duration-700 delay-100" />
+            
+            {/* Dashed inner bounding to preserve the blueprint feel but make it premium */}
+            <div className="absolute inset-4 border-2 border-dashed border-white/10 rounded-[1.5rem] pointer-events-none" />
+
+            <div className="relative z-10 w-24 h-24 bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_10px_30px_rgba(0,0,0,0.5)] rounded-2xl flex items-center justify-center mb-8 transform group-hover:scale-105 transition-transform duration-500">
+               <FileText className="w-10 h-10 text-gray-400 group-hover:text-white transition-colors" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">No resumes yet</h3>
-            <p className="text-gray-400 max-w-md mb-8">
-              You haven't created any resumes. Start building your professional profile using our AI generator to land your dream job!
+            <h3 className="relative z-10 text-3xl font-black text-white mb-4 tracking-tight">No resumes yet</h3>
+            <p className="relative z-10 text-gray-400 max-w-md mb-10 text-lg leading-relaxed">
+              Start building your professional profile using our AI generator to land your absolute dream job.
             </p>
             <Link
               href="/create"
-              className="flex items-center gap-2 bg-white text-gray-950 px-8 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors hover:scale-105 duration-200"
+              className="relative z-10 group/btn flex items-center gap-2 bg-gradient-to-r from-violet-600 to-cyan-600 text-white px-8 py-4 rounded-xl font-bold hover:from-violet-500 hover:to-cyan-500 transition-all hover:scale-105 shadow-[0_0_30px_rgba(139,92,246,0.3)] hover:shadow-[0_0_40px_rgba(139,92,246,0.5)]"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-5 h-5 transition-transform group-hover/btn:rotate-90" />
               Build Your First Resume
             </Link>
           </div>

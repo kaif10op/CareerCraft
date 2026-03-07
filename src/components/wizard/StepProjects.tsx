@@ -18,11 +18,16 @@ export function StepProjects() {
   });
 
   return (
-    <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-8 animate-in slide-in-from-right-4 fade-in duration-300">
+      <div className="flex items-center justify-between mb-8 pb-3 border-b border-gray-800">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Projects <span className="text-sm font-normal text-gray-500 ml-2">(Optional)</span></h2>
-          <p className="text-gray-400 text-sm">Stand out by sharing your most impactful side projects or open-source work.</p>
+          <h2 className="text-3xl font-extrabold mb-1 text-white tracking-tight">
+            Projects{" "}
+            <span className="text-sm font-medium ml-3 text-gray-500">(Optional)</span>
+          </h2>
+          <p className="text-base font-medium text-gray-400">
+            Stand out by sharing your most impactful side projects or open-source work.
+          </p>
         </div>
         <button
           type="button"
@@ -34,7 +39,7 @@ export function StepProjects() {
               techStack: "",
             })
           }
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600/10 text-violet-400 border border-violet-500/30 hover:bg-violet-600/20 transition-colors text-sm font-medium whitespace-nowrap"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-colors bg-violet-500/10 text-violet-400 border border-violet-500/30 hover:bg-violet-500/20"
         >
           <Plus className="w-4 h-4" />
           Add Project
@@ -43,8 +48,10 @@ export function StepProjects() {
 
       <div className="space-y-6">
         {fields.length === 0 && (
-          <div className="text-center py-10 border-2 border-dashed border-gray-800 rounded-2xl bg-gray-900/20">
-            <p className="text-gray-500">No projects added. Click 'Add Project' to showcase your portfolio work.</p>
+          <div className="text-center py-16 rounded-3xl border-2 border-dashed border-gray-800 bg-gray-900/30">
+            <p className="text-gray-500 font-medium">
+              No projects added. Click &apos;Add Project&apos; to showcase your portfolio work.
+            </p>
           </div>
         )}
         
@@ -55,26 +62,29 @@ export function StepProjects() {
               initial={{ opacity: 0, height: 0, y: -20 }}
               animate={{ opacity: 1, height: "auto", y: 0 }}
               exit={{ opacity: 0, height: 0, overflow: "hidden", transition: { duration: 0.2 } }}
-              className="bg-gray-800/40 border border-gray-700/50 rounded-2xl p-6 relative group"
+              className="rounded-3xl p-6 sm:p-8 relative group bg-gray-800/20 border border-gray-700/50 shadow-sm"
             >
-              <div className="absolute top-4 left-4 text-gray-600 cursor-grab hover:text-gray-400">
+              <div className="absolute top-6 left-4 cursor-grab text-gray-500 hover:text-gray-300 transition-colors">
                 <GripVertical className="w-5 h-5 hidden sm:block" />
               </div>
               
               <button
                 type="button"
                 onClick={() => remove(index)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-red-400 p-2 rounded-lg hover:bg-red-400/10 transition-colors"
+                className="absolute top-5 right-5 p-2 rounded-xl transition-all text-gray-500 hover:text-red-400 hover:bg-red-500/10"
                 title="Remove Project"
               >
                 <Trash2 className="w-5 h-5" />
               </button>
 
-              <div className="pl-0 sm:pl-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="pl-0 sm:pl-6">
+                <h3 className="text-xl font-bold mb-5 text-white">
+                  Project #{index + 1}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                   <Input
                     label="Project Name"
-                    placeholder="e.g. AI Resume Builder"
+                    placeholder="e.g. Carrier Craft"
                     {...register(`projects.${index}.name`)}
                     error={errors.projects?.[index]?.name?.message}
                   />

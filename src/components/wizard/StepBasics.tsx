@@ -13,31 +13,44 @@ export function StepBasics() {
   const selectedRole = watch("role") || "professional";
 
   return (
-    <div className="space-y-6 animate-in slide-in-from-right-4 fade-in">
+    <div className="space-y-8 animate-in slide-in-from-right-4 fade-in">
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Basic Information</h2>
-        <p className="text-gray-400 text-sm mb-6">Let&apos;s start with your contact details and professional links.</p>
+        <h2 className="text-3xl font-extrabold mb-3 text-white tracking-tight">
+          Basic Information
+        </h2>
+        <p className="text-base text-gray-400 font-medium pb-2 border-b border-gray-800">
+          Let&apos;s start with your contact details and professional links.
+        </p>
       </div>
 
       {/* Role Selector */}
       <div className="mb-8">
-        <label className="block text-sm font-medium text-gray-300 mb-3">I am a...</label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {ROLE_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => setValue("role", option.value, { shouldValidate: true })}
-              className={`text-left p-4 rounded-xl border-2 transition-all duration-200 ${
-                selectedRole === option.value
-                  ? "border-violet-500 bg-violet-500/10 shadow-lg shadow-violet-500/10"
-                  : "border-gray-800 bg-gray-900/50 hover:border-gray-700 hover:bg-gray-800/50"
-              }`}
-            >
-              <div className="text-base font-semibold text-white mb-0.5">{option.label}</div>
-              <div className="text-xs text-gray-400">{option.description}</div>
-            </button>
-          ))}
+        <label className="block text-sm font-semibold mb-4 text-gray-300">
+          I am a...
+        </label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {ROLE_OPTIONS.map((option) => {
+            const isSelected = selectedRole === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setValue("role", option.value, { shouldValidate: true })}
+                className={`text-left p-5 rounded-2xl transition-all duration-200 border-2 ${
+                  isSelected
+                    ? "border-violet-500 bg-violet-500/10 shadow-[0_10px_20px_-5px_rgba(139,92,246,0.15)]"
+                    : "border-gray-800 bg-gray-900/40 hover:border-gray-700 hover:bg-gray-800/50"
+                }`}
+              >
+                <div className={`text-base font-bold mb-1 ${isSelected ? 'text-violet-300' : 'text-white'}`}>
+                  {option.label}
+                </div>
+                <div className="text-sm text-gray-400 leading-relaxed font-medium">
+                  {option.description}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 

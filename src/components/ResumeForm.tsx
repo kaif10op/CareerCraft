@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { resumeSchema, ResumeFormValues, defaultValues } from "@/lib/schema";
@@ -45,7 +46,6 @@ export default function ResumeForm() {
   const { trigger, handleSubmit, formState: { isValid }, watch, reset } = methods;
   const role = watch("role") || "professional";
 
-  // For students/freshers, experience is fully optional — don't block on validation
   const getSteps = () => {
     return ALL_STEPS;
   };
@@ -80,13 +80,11 @@ export default function ResumeForm() {
     const currentFields = STEPS[currentStep].fields;
     const currentStepId = STEPS[currentStep].id;
 
-    // For students/freshers, skip validation on experience and education steps
     const isOptionalStep =
       (role === "student" || role === "fresher") &&
       (currentStepId === "experience" || currentStepId === "education");
 
     if (isOptionalStep) {
-      // Just move forward without validation
       if (currentStep < STEPS.length - 1) {
         setCurrentStep((prev) => prev + 1);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -94,7 +92,6 @@ export default function ResumeForm() {
       return;
     }
 
-    // For projects step, always skip validation (it's optional for everyone)
     if (currentStepId === "projects") {
       if (currentStep < STEPS.length - 1) {
         setCurrentStep((prev) => prev + 1);
@@ -125,9 +122,18 @@ export default function ResumeForm() {
     setApiError("");
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+      
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(data),
       });
 
@@ -137,9 +143,7 @@ export default function ResumeForm() {
         throw new Error(resData.error || "Failed to generate resume");
       }
 
-      // Clear localStorage cache after successful generation
       localStorage.removeItem(LOCAL_STORAGE_KEY);
-
       router.push(`/preview/${resData.id}`);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : "Something went wrong");
@@ -151,33 +155,20 @@ export default function ResumeForm() {
 
   return (
     <FormProvider {...methods}>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start relative">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start relative mt-6">
 
         {/* Left Side: The Wizard Form */}
-        <div
-          className="flex flex-col h-full rounded-3xl overflow-hidden relative min-h-[600px]"
-          style={{
-            backgroundColor: "rgba(3, 7, 18, 0.5)",
-            backdropFilter: "blur(16px)",
-            border: "1px solid #1f2937",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-          }}
-        >
-          {/* Decorative top gradient */}
-          <div
-            className="absolute top-0 left-0 right-0 h-1"
-            style={{ background: "linear-gradient(to right, #7c3aed, #a855f7, #06b6d4)" }}
-          />
+        <div className="relative flex flex-col h-full min-h-[600px] w-full isolate">
+          {/* Subtle Outer Glow behind form */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/20 to-cyan-600/20 blur-2xl opacity-50 -z-10 rounded-3xl" />
+          
+          <div className="flex flex-col h-full rounded-3xl overflow-hidden relative bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.05)]">
+            {/* Decorative top gradient */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-violet-500 via-purple-500 to-cyan-500 shadow-[0_0_10px_rgba(139,92,246,0.8)]" />
 
-          <div
-            className="px-8 pt-8 pb-4"
-            style={{
-              borderBottom: "1px solid rgba(31, 41, 55, 0.5)",
-              backgroundColor: "rgba(17, 24, 39, 0.3)",
-            }}
-          >
-            <Stepper steps={STEPS} currentStep={currentStep} />
-          </div>
+            <div className="px-8 pt-8 pb-4 border-b border-white/5 bg-white/[0.01]">
+              <Stepper steps={STEPS} currentStep={currentStep} />
+            </div>
 
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -209,19 +200,12 @@ export default function ResumeForm() {
               </AnimatePresence>
             </div>
 
-            <div
-              className="p-6 flex items-center justify-between"
-              style={{
-                borderTop: "1px solid rgba(31, 41, 55, 0.8)",
-                backgroundColor: "rgba(17, 24, 39, 0.5)",
-              }}
-            >
+            <div className="p-6 flex items-center justify-between border-t border-white/5 bg-white/[0.01] backdrop-blur-md">
               <button
                 type="button"
                 onClick={handlePrevious}
                 disabled={currentStep === 0 || isGenerating}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                style={{ border: "1px solid #374151", color: "#d1d5db" }}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white shadow-sm"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
@@ -231,11 +215,7 @@ export default function ResumeForm() {
                 <button
                   type="submit"
                   disabled={isGenerating}
-                  className="group relative flex items-center gap-2 px-8 py-3 rounded-xl text-white font-semibold transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                  style={{
-                    background: "linear-gradient(135deg, #7c3aed, #0891b2)",
-                    boxShadow: "0 4px 14px rgba(139, 92, 246, 0.25)",
-                  }}
+                  className="group relative flex items-center gap-2 px-8 py-3 rounded-xl text-white font-semibold transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none bg-gradient-to-r from-violet-600 to-cyan-600 shadow-[0_4px_14px_rgba(139,92,246,0.25)] hover:shadow-[0_6px_20px_rgba(139,92,246,0.4)]"
                 >
                   {isGenerating ? (
                     <>
@@ -245,7 +225,7 @@ export default function ResumeForm() {
                   ) : (
                     <>
                       <Wand2 className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                      Generate AI Resume
+                      Generate Carrier Craft Resume
                     </>
                   )}
                 </button>
@@ -253,8 +233,7 @@ export default function ResumeForm() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-colors"
-                  style={{ backgroundColor: "#ffffff", color: "#030712" }}
+                  className="flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-colors bg-white text-gray-950 hover:bg-gray-100 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-gray-950 outline-none"
                 >
                   Next Step
                   <ArrowRight className="w-4 h-4" />
@@ -262,10 +241,13 @@ export default function ResumeForm() {
               )}
             </div>
           </form>
+          </div>
         </div>
 
         {/* Right Side: Live Preview (Hidden on mobile) */}
-        <div className="hidden lg:block h-full min-h-[600px] max-h-[85vh] sticky top-24">
+        <div className="hidden lg:flex h-[85vh] sticky top-24 rounded-3xl overflow-hidden bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex-col relative group">
+           {/* Desk surface ambient glow */}
+           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-violet-500/5 pointer-events-none" />
           <LivePreview />
         </div>
 

@@ -63,16 +63,18 @@ export function StepExperience() {
   };
 
   return (
-    <div className="space-y-6 animate-in slide-in-from-right-4 fade-in">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-8 animate-in slide-in-from-right-4 fade-in">
+      <div className="flex items-center justify-between mb-8 pb-3 border-b border-gray-800">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">
+          <h2 className="text-3xl font-extrabold mb-1 text-white tracking-tight">
             Work Experience
             {(role === "student" || role === "fresher") && (
-              <span className="text-sm font-normal text-gray-500 ml-2">(Optional)</span>
+              <span className="text-sm font-medium text-gray-500 ml-3">
+                (Optional)
+              </span>
             )}
           </h2>
-          <p className="text-gray-400 text-sm">
+          <p className="text-base font-medium text-gray-400">
             {role === "student"
               ? "Add any internships, part-time jobs, or volunteer work you've done."
               : role === "fresher"
@@ -91,7 +93,7 @@ export function StepExperience() {
               description: "",
             })
           }
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600/10 text-violet-400 border border-violet-500/30 hover:bg-violet-600/20 transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors bg-violet-500/10 text-violet-400 border border-violet-500/30 hover:bg-violet-500/20"
         >
           <Plus className="w-4 h-4" />
           Add Experience
@@ -99,14 +101,14 @@ export function StepExperience() {
       </div>
 
       {aiError && (
-        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-sm">
+        <div className="p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400">
           {aiError}
         </div>
       )}
 
       {fields.length === 0 && (
-        <div className="text-center py-10 border-2 border-dashed border-gray-800 rounded-2xl bg-gray-900/20">
-          <p className="text-gray-500">
+        <div className="text-center py-16 rounded-3xl border-2 border-dashed border-gray-800 bg-gray-900/30">
+          <p className="text-gray-500 font-medium">
             {role === "student" || role === "fresher"
               ? "No experience yet? That's okay! You can skip this step and focus on projects and skills."
               : "Click 'Add Experience' to start listing your work history."}
@@ -122,9 +124,9 @@ export function StepExperience() {
               initial={{ opacity: 0, height: 0, y: -20 }}
               animate={{ opacity: 1, height: "auto", y: 0 }}
               exit={{ opacity: 0, height: 0, overflow: "hidden", transition: { duration: 0.2 } }}
-              className="bg-gray-800/40 border border-gray-700/50 rounded-2xl p-6 relative group"
+              className="rounded-3xl p-6 sm:p-8 relative group bg-gray-800/20 border border-gray-700/50 shadow-sm"
             >
-              <div className="absolute top-4 left-4 text-gray-600 cursor-grab hover:text-gray-400">
+              <div className="absolute top-6 left-4 cursor-grab text-gray-500 hover:text-gray-300 transition-colors">
                 <GripVertical className="w-5 h-5 hidden sm:block" />
               </div>
 
@@ -132,16 +134,18 @@ export function StepExperience() {
                 <button
                   type="button"
                   onClick={() => remove(index)}
-                  className="absolute top-4 right-4 text-gray-500 hover:text-red-400 p-2 rounded-lg hover:bg-red-400/10 transition-colors"
+                  className="absolute top-5 right-5 p-2 rounded-xl transition-all text-gray-500 hover:text-red-400 hover:bg-red-500/10"
                   title="Remove Experience"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
               )}
 
-              <div className="pl-0 sm:pl-8">
-                <h3 className="text-lg font-semibold text-white mb-4">Position #{index + 1}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="pl-0 sm:pl-6">
+                <h3 className="text-xl font-bold mb-5 text-white">
+                  Position #{index + 1}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                   <Input
                     label="Company Name"
                     placeholder="e.g. Google"
@@ -180,16 +184,16 @@ export function StepExperience() {
                   type="button"
                   disabled={aiLoadingIndex === index}
                   onClick={() => handleAIImprove(index)}
-                  className="ai-btn mt-3 flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600/20 to-purple-600/20 text-violet-300 border border-violet-500/40 hover:border-violet-400 hover:text-white text-xs font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="ai-btn mt-4 flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-300 border border-violet-500/40 hover:border-violet-400 hover:text-white"
                 >
                   {aiLoadingIndex === index ? (
                     <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                       Improving...
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-3.5 h-3.5" />
+                      <Sparkles className="w-4 h-4" />
                       ✨ Improve with AI
                     </>
                   )}

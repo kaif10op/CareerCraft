@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useForm, FormProvider } from "react-hook-form";
@@ -8,9 +8,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { resumeSchema, ResumeFormValues, defaultValues } from "@/lib/schema";
 import { Stepper } from "@/components/ui/Stepper";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, ArrowLeft, Loader2, Wand2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, Loader2, Wand2, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 // Wizard Steps
+import { StepTemplate } from "./wizard/StepTemplate";
 import { StepBasics } from "./wizard/StepBasics";
 import { StepSummary } from "./wizard/StepSummary";
 import { StepExperience } from "./wizard/StepExperience";
@@ -18,8 +20,10 @@ import { StepEducation } from "./wizard/StepEducation";
 import { StepProjects } from "./wizard/StepProjects";
 import { StepSkills } from "./wizard/StepSkills";
 import { LivePreview } from "./wizard/LivePreview";
+import { AtsInsights } from "./wizard/AtsInsights";
 
 const ALL_STEPS = [
+  { id: "template", title: "Design", fields: ["templateId"] },
   { id: "basics", title: "Basics", fields: ["fullName", "email", "phone", "linkedin", "github", "portfolio", "location", "jobTitle", "role"] },
   { id: "summary", title: "Summary", fields: ["summary"] },
   { id: "experience", title: "Experience", fields: ["experience"] },
@@ -36,6 +40,7 @@ export default function ResumeForm() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [apiError, setApiError] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+  const formContainerRef = useRef<HTMLDivElement>(null);
 
   const methods = useForm<ResumeFormValues>({
     resolver: zodResolver(resumeSchema) as any,
@@ -87,7 +92,7 @@ export default function ResumeForm() {
     if (isOptionalStep) {
       if (currentStep < STEPS.length - 1) {
         setCurrentStep((prev) => prev + 1);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        formContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
       }
       return;
     }
@@ -95,7 +100,7 @@ export default function ResumeForm() {
     if (currentStepId === "projects") {
       if (currentStep < STEPS.length - 1) {
         setCurrentStep((prev) => prev + 1);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        formContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
       }
       return;
     }
@@ -105,7 +110,7 @@ export default function ResumeForm() {
     if (isStepValid) {
       if (currentStep < STEPS.length - 1) {
         setCurrentStep((prev) => prev + 1);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        formContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
       }
     }
   };
@@ -113,7 +118,26 @@ export default function ResumeForm() {
   const handlePrevious = () => {
     if (currentStep > 0) {
       setCurrentStep((prev) => prev - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      formContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const onInvalid = (errors: any) => {
+    // Find the first field with an error
+    const firstErrorField = Object.keys(errors)[0];
+    if (!firstErrorField) return;
+
+    // Find which step this field belongs to
+    // For arrays like experience.0.company, we just need the root key 'experience'
+    const rootKey = firstErrorField.split('.')[0];
+    const stepIndex = STEPS.findIndex(step => step.fields.includes(rootKey));
+    
+    if (stepIndex !== -1 && stepIndex !== currentStep) {
+      setCurrentStep(stepIndex);
+      toast.error(`Please fix errors in the ${STEPS[stepIndex].title} section`);
+      formContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      toast.error("Please fix the highlighted errors before submitting.");
     }
   };
 
@@ -122,7 +146,14 @@ export default function ResumeForm() {
     setApiError("");
 
     try {
+      // Get a fresh session/user to avoid stale tokens
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
       const { data: { session } } = await supabase.auth.getSession();
+
+      if (userError) {
+        console.warn("User session verification failed:", userError);
+      }
+
       const headers: HeadersInit = {
         "Content-Type": "application/json",
       };
@@ -171,14 +202,33 @@ export default function ResumeForm() {
             </div>
 
           <form
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(onSubmit, onInvalid)}
             className="flex flex-col flex-1 max-h-[70vh]"
           >
-            <div className="flex-1 p-8 overflow-y-auto custom-scrollbar relative">
+            <div ref={formContainerRef} className="flex-1 p-8 overflow-y-auto custom-scrollbar relative scroll-smooth">
               {apiError && (
                 <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm fade-in">
                   <p className="font-semibold mb-1">Error Generating Resume</p>
                   {apiError}
+                </div>
+              )}
+
+              {Object.keys(methods.formState.errors).length > 0 && (
+                <div className="mb-8 p-6 rounded-[2rem] bg-red-500/5 border border-red-500/20 animate-in fade-in zoom-in duration-500">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center shrink-0 shadow-lg shadow-red-500/20">
+                      <AlertCircle className="w-4 h-4 text-white" />
+                    </div>
+                    <h4 className="text-red-300 font-bold text-lg">Fix needed before proceeding</h4>
+                  </div>
+                  <ul className="space-y-2 ml-11">
+                    {Object.entries(methods.formState.errors).map(([key, error]: [string, any]) => (
+                      <li key={key} className="text-sm text-red-400/80 flex items-center gap-2">
+                        <span className="w-1 h-1 rounded-full bg-red-500/50" />
+                        <span className="font-bold capitalize">{key.replace(/([A-Z])/g, ' $1')}:</span> {error.message || "This field is required"}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
 
@@ -190,12 +240,13 @@ export default function ResumeForm() {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.25, ease: "easeOut" }}
                 >
-                  {currentStep === 0 && <StepBasics />}
-                  {currentStep === 1 && <StepSummary />}
-                  {currentStep === 2 && <StepExperience />}
-                  {currentStep === 3 && <StepEducation />}
-                  {currentStep === 4 && <StepProjects />}
-                  {currentStep === 5 && <StepSkills />}
+                  {currentStep === 0 && <StepTemplate />}
+                  {currentStep === 1 && <StepBasics />}
+                  {currentStep === 2 && <StepSummary />}
+                  {currentStep === 3 && <StepExperience />}
+                  {currentStep === 4 && <StepEducation />}
+                  {currentStep === 5 && <StepProjects />}
+                  {currentStep === 6 && <StepSkills />}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -245,10 +296,13 @@ export default function ResumeForm() {
         </div>
 
         {/* Right Side: Live Preview (Hidden on mobile) */}
-        <div className="hidden lg:flex h-[85vh] sticky top-24 rounded-3xl overflow-hidden bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex-col relative group">
-           {/* Desk surface ambient glow */}
-           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-violet-500/5 pointer-events-none" />
-          <LivePreview />
+        <div className="hidden lg:flex flex-col gap-6 sticky top-24 h-[calc(100vh-120px)] animate-in fade-in slide-in-from-right-8 duration-700 delay-300">
+           {currentStep > 0 && <AtsInsights />}
+           <div className="flex-1 rounded-3xl overflow-hidden bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex-col relative group">
+              {/* Desk surface ambient glow */}
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-violet-500/5 pointer-events-none" />
+              <LivePreview />
+           </div>
         </div>
 
       </div>

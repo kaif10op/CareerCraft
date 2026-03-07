@@ -61,29 +61,29 @@ function buildPrompt(input: ResumeInput): string {
 
   const educationText = input.education && input.education.length > 0
     ? input.education
-        .map((e) => `- ${e.degree} in ${e.field} from ${e.institution} (${e.startYear} - ${e.endYear})`)
-        .join("\n")
+      .map((e) => `- ${e.degree} in ${e.field} from ${e.institution} (${e.startYear} - ${e.endYear})`)
+      .join("\n")
     : "None provided.";
 
   const experienceText = input.experience && input.experience.length > 0
     ? input.experience
-        .map((e) => `- ${e.position} at ${e.company} (${e.startDate} - ${e.endDate}): ${e.description}`)
-        .join("\n")
+      .map((e) => `- ${e.position} at ${e.company} (${e.startDate} - ${e.endDate}): ${e.description}`)
+      .join("\n")
     : "None provided.";
 
   const projectsText = input.projects && input.projects.length > 0
     ? input.projects.map(
-        (p) => `- ${p.name}${p.techStack ? ` (${p.techStack})` : ""}: ${p.description}${p.link ? ` [Link](${p.link})` : ""}`
-      ).join("\n")
+      (p) => `- ${p.name}${p.techStack ? ` (${p.techStack})` : ""}: ${p.description}${p.link ? ` [Link](${p.link})` : ""}`
+    ).join("\n")
     : "None provided.";
 
   const certsText = input.certifications && input.certifications.length > 0
     ? input.certifications.map(
-        (c) => `- ${c.name} by ${c.issuer} (${c.date})`
-      ).join("\n")
+      (c) => `- ${c.name} by ${c.issuer} (${c.date})`
+    ).join("\n")
     : "None provided.";
 
-  const skillsText = input.skills.join(", ");
+  const skillsText = input.skills && input.skills.length > 0 ? input.skills.join(", ") : "None provided.";
 
   // Role-specific instructions
   let roleInstructions = "";
@@ -104,13 +104,39 @@ function buildPrompt(input: ResumeInput): string {
       roleInstructions = `This person is an experienced PROFESSIONAL. Create a traditional, polished resume emphasizing career progression, impact metrics, and leadership.`;
   }
 
-  return `You are a professional resume writer. Generate a polished, ATS-friendly professional resume in clean Markdown format for the following person. Make it impressive, well-structured, and ready to use. Use proper sections with headers. Do NOT include any explanations or notes — only output the resume content.
+  // Template-aware instructions
+  const templateId = input.templateId || "modern";
+  let templateInstructions = "";
+
+  if (templateId.includes("sidebar") || ["tech", "academic", "hybrid", "sleek"].includes(templateId)) {
+    templateInstructions = `\n**LAYOUT OPTIMIZATION (SIDEBAR):** This template uses a sidebar. Keep the summary concise (max 3-4 lines) and focus on the most impactful skills and achievements to ensure the content fits perfectly in the narrower columns. Use short, punchy bullet points.`;
+  } else if (templateId === "executive" || templateId === "elegant" || templateId === "professional") {
+    templateInstructions = `\n**LAYOUT OPTIMIZATION (EXECUTIVE):** This is a high-level executive template. Use sophisticated vocabulary, emphasize leadership, strategy, and bottom-line impact. The summary can be more detailed and visionary.`;
+  } else if (templateId === "creative" || templateId === "functional") {
+    templateInstructions = `\n**LAYOUT OPTIMIZATION (MODERN/CREATIVE):** This template uses a multi-column or modern card layout. Ensure section balance. For projects, highlight tech stacks clearly.`;
+  } else if (templateId === "classic" || templateId === "simple") {
+    templateInstructions = `\n**LAYOUT OPTIMIZATION (CLASSIC):** This is a traditional linear layout. Focus on chronological clarity and standard professional formatting.`;
+  }
+
+  return `You are an expert Resume Writer and ATS Optimizer. Generate a polished, professional resume in pure Markdown format for the following candidate. 
+DO NOT include any conversational text, introductory thoughts, or explanations. Just output the raw Markdown.
+
+**CRITCAL FORMATTING RULES:**
+1. Use exactly \`## \` for the main section headers (e.g., \`## Professional Summary\`, \`## Work Experience\`, \`## Education\`). Do not add any extra symbols like underscores.
+2. The very top of the resume MUST start with the candidate's name format like this:
+# [Full Name]
+[Job Title (if any)]
+[Contact line with Email, Phone, LinkedIn, Location separated by bullets]
+
+3. Do NOT use multi-level nesting (\`###\`, \`####\`) for sections. Keep structural hierarchy simple.
+4. For Work Experience and Projects, output the company/title/dates as bold plain text and use standard bullet points \`- \` for the descriptions.
+5. Emphasize action verbs, quantify achievements with metrics where possible, and remove fluff.
+6. IF A SECTION IS MARKED AS "None provided.", SKIP IT ENTIRELY. DO NOT create the section header.
 
 ${roleInstructions}
+${templateInstructions}
 
-IMPORTANT: Only include sections that have content. If a section has "None provided", skip it entirely — do NOT add placeholder text.
-
-**Personal Information:**
+**CANDIDATE DATA:**
 - Name: ${input.fullName}
 ${input.jobTitle ? `- Professional Title: ${input.jobTitle}` : ""}
 - Email: ${input.email}
@@ -120,7 +146,7 @@ ${input.linkedin ? `- LinkedIn: ${input.linkedin}` : ""}
 ${input.github ? `- GitHub: ${input.github}` : ""}
 ${input.portfolio ? `- Portfolio: ${input.portfolio}` : ""}
 
-**Professional Summary:**
+**Professional Summary Details:**
 ${input.summary}
 
 **Work Experience:**
@@ -138,7 +164,7 @@ ${certsText}
 **Skills:**
 ${skillsText}
 
-Generate a complete, professional resume in Markdown format. Include proper formatting with headers (##), bullet points, and clean spacing. Make it ATS-optimized, modern, and impressive. Adapt the tone and structure for the candidate's profile type.`;
+Remember, output strictly Markdown and apply ATS-optimization to the candidate's raw text. Avoid excessive bolding within bullet points.`;
 }
 
 export async function generateResume(input: ResumeInput): Promise<string> {
@@ -161,9 +187,9 @@ export async function generateResume(input: ResumeInput): Promise<string> {
 
     try {
       console.log(`Trying AI provider: ${provider.name}...`);
-      
+
       let requestBody;
-      
+
       // Formatting the payload based on provider
       if (provider.name.includes("Gemini API")) {
         requestBody = JSON.stringify({
@@ -205,7 +231,7 @@ export async function generateResume(input: ResumeInput): Promise<string> {
       }
 
       const data = await response.json();
-      
+
       // Parsing the response based on provider
       let content;
       if (provider.name.includes("Gemini API")) {

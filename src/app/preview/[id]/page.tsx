@@ -46,6 +46,9 @@ export default function PreviewPage() {
         if (!response.ok) throw new Error("Resume not found or access denied");
         const data = await response.json();
         setResume(data);
+        if (data.template_id) {
+          setTemplate(data.template_id);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load resume");
       } finally {
@@ -55,6 +58,33 @@ export default function PreviewPage() {
 
     fetchResume();
   }, [params.id]);
+
+  // Automatic association if logged in but resume is "anonymous"
+  useEffect(() => {
+    const associateResume = async () => {
+      if (user && resume && !resume.user_id && !isSaving) {
+        try {
+          setIsSaving(true);
+          const { error } = await supabase
+            .from("resumes")
+            .update({ user_id: user.id })
+            .eq("id", resume.id);
+          
+          if (error) throw error;
+          
+          // Update local state to reflect ownership
+          setResume(prev => prev ? { ...prev, user_id: user.id } : null);
+          console.log("Successfully associated resume with your account.");
+        } catch (err) {
+          console.error("Failed to automatically associate resume", err);
+        } finally {
+          setIsSaving(false);
+        }
+      }
+    };
+
+    associateResume();
+  }, [user, resume, isSaving]);
 
   const handleDownload = async () => {
     if (!user) {

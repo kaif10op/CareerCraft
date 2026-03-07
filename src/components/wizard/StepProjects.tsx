@@ -2,13 +2,16 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { ResumeFormValues } from "@/lib/schema";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Plus, Trash2, GripVertical, Sparkles, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 export function StepProjects() {
   const {
     control,
     register,
+    watch,
+    setValue,
     formState: { errors },
   } = useFormContext<ResumeFormValues>();
 
@@ -16,6 +19,42 @@ export function StepProjects() {
     control,
     name: "projects",
   });
+
+  const [aiLoadingIndex, setAiLoadingIndex] = useState<number | null>(null);
+  const [aiError, setAiError] = useState("");
+
+  const handleAIImprove = async (index: number) => {
+    const projects = watch("projects") || [];
+    const proj = projects[index];
+    if (!proj) return;
+
+    setAiLoadingIndex(index);
+    setAiError("");
+
+    try {
+      const response = await fetch("/api/ai-assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "projects",
+          context: {
+            name: proj.name,
+            techStack: proj.techStack,
+            description: proj.description || "General project work",
+          },
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to improve description");
+
+      setValue(`projects.${index}.description`, data.result, { shouldValidate: true });
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "AI assist failed");
+    } finally {
+      setAiLoadingIndex(null);
+    }
+  };
 
   return (
     <div className="space-y-8 animate-in slide-in-from-right-4 fade-in duration-300">
@@ -110,6 +149,25 @@ export function StepProjects() {
                   {...register(`projects.${index}.description`)}
                   error={errors.projects?.[index]?.description?.message}
                 />
+                
+                <button
+                  type="button"
+                  disabled={aiLoadingIndex === index}
+                  onClick={() => handleAIImprove(index)}
+                  className="ai-btn mt-4 flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-300 border border-violet-500/40 hover:border-violet-400 hover:text-white"
+                >
+                  {aiLoadingIndex === index ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Improving...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      ✨ Improve with AI
+                    </>
+                  )}
+                </button>
               </div>
             </motion.div>
           ))}

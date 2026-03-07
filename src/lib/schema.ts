@@ -63,6 +63,7 @@ export const resumeSchema = z.object({
   ).optional().default([]),
 
   skills: z.array(z.string()).min(1, "At least one skill is required"),
+  templateId: z.string().default("modern"),
 });
 
 export type ResumeFormValues = z.infer<typeof resumeSchema>;
@@ -83,4 +84,5 @@ export const defaultValues: Partial<ResumeFormValues> = {
   projects: [],
   certifications: [],
   skills: [],
+  templateId: "modern",
 };

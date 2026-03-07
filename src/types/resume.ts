@@ -44,6 +44,7 @@ export interface ResumeInput {
   projects?: Project[];
   certifications?: Certification[];
   skills: string[];
+  templateId?: string;
 }
 
 export interface ResumeRecord {
@@ -63,6 +64,7 @@ export interface ResumeRecord {
   certifications?: Certification[];
   skills: string[];
   generated_resume: string;
+  template_id?: string;
   created_at: string;
   user_id?: string;
 }

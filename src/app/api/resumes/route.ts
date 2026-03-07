@@ -1,21 +1,44 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("Authorization");
-  if (!authHeader) {
-    return NextResponse.json({ error: "No authorization header" }, { status: 401 });
+  if (!authHeader || !authHeader.startsWith("Bearer ") || authHeader.length <= 7) {
+    return NextResponse.json({ error: "Missing or invalid authorization header" }, { status: 401 });
   }
 
-  const token = authHeader.replace("Bearer ", "");
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  const token = authHeader.substring(7);
+  let user;
 
-  if (authError || !user) {
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  try {
+    const { data: authData, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !authData?.user) {
+      console.error("Auth error in resumes list:", authError);
+      return NextResponse.json({ error: "Your session has expired. Please sign in again." }, { status: 401 });
+    }
+    user = authData.user;
+  } catch (err) {
+    console.error("Unexpected auth crash in resumes list:", err);
+    return NextResponse.json({ error: "Authentication service error." }, { status: 401 });
   }
 
   try {
-    const { data, error } = await supabase
+    // Create a client with the user's token to respect RLS
+    const dbClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: authHeader,
+          },
+        },
+      }
+    );
+
+    // Fetch resumes - RLS will handle security, but we add eq for safety
+    const { data, error } = await dbClient
       .from("resumes")
       .select("*")
       .eq("user_id", user.id)

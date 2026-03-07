@@ -3,6 +3,7 @@
 import { useFormContext } from "react-hook-form";
 import { ResumeFormValues } from "@/lib/schema";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
 
 export function LivePreview() {
   const { watch } = useFormContext<ResumeFormValues>();
@@ -58,9 +59,9 @@ export function LivePreview() {
       {/* Summary */}
       {data.summary && (
         <div className="mb-6">
-          <p className="leading-relaxed text-sm whitespace-pre-wrap text-gray-700">
-            {data.summary}
-          </p>
+          <div className="leading-relaxed text-sm text-gray-700 prose prose-sm max-w-none">
+            <ReactMarkdown>{data.summary}</ReactMarkdown>
+          </div>
         </div>
       )}
 
@@ -81,9 +82,9 @@ export function LivePreview() {
                 </div>
                 <div className="text-sm font-semibold mb-2 text-gray-700">{exp.company}</div>
                 {exp.description && (
-                  <p className="text-[13px] whitespace-pre-wrap leading-relaxed text-gray-600">
-                    {exp.description}
-                  </p>
+                  <div className="text-[13px] leading-relaxed text-gray-600 prose prose-sm max-w-none">
+                    <ReactMarkdown>{exp.description}</ReactMarkdown>
+                  </div>
                 )}
               </div>
             ))}
@@ -154,9 +155,9 @@ export function LivePreview() {
                   )}
                 </div>
                 {proj.description && (
-                  <p className="text-[13px] whitespace-pre-wrap leading-relaxed text-gray-600">
-                    {proj.description}
-                  </p>
+                  <div className="text-[13px] leading-relaxed text-gray-600 prose prose-sm max-w-none">
+                    <ReactMarkdown>{proj.description}</ReactMarkdown>
+                  </div>
                 )}
               </div>
             ))}

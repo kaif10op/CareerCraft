@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { generateResume } from "@/lib/openrouter";
 import { supabase } from "@/lib/supabase";
 import { ResumeInput } from "@/types/resume";
@@ -10,11 +11,27 @@ export async function POST(request: Request) {
     // Check for user session
     let userId: string | null = null;
     const authHeader = request.headers.get("Authorization");
-    if (authHeader) {
-      const token = authHeader.replace("Bearer ", "");
-      const { data: { user } } = await supabase.auth.getUser(token);
-      if (user) {
-        userId = user.id;
+
+    if (authHeader && authHeader.startsWith("Bearer ") && authHeader.length > 7) {
+      const token = authHeader.substring(7);
+      try {
+        const { data: authData, error: authError } = await supabase.auth.getUser(token);
+
+        if (authError || !authData?.user) {
+          console.error("Auth error during generation:", authError);
+          const message = authError?.message || "Invalid or expired session. Please try signing out and back in.";
+          return NextResponse.json(
+            { error: `Authentication Error: ${message}` },
+            { status: 401 }
+          );
+        }
+        userId = authData.user.id;
+      } catch (err) {
+        console.error("Unexpected auth crash:", err);
+        return NextResponse.json(
+          { error: "Authentication service error. Please try again." },
+          { status: 401 }
+        );
       }
     }
 
@@ -33,36 +50,49 @@ export async function POST(request: Request) {
     // Build database record
     const resumeRecord: any = {
       full_name: input.fullName,
-      job_title: input.jobTitle,
+      job_title: input.jobTitle || "",
       email: input.email,
-      phone: input.phone,
-      location: input.location,
-      linkedin: input.linkedin,
-      github: input.github,
-      portfolio: input.portfolio || null,
-      summary: input.summary,
-      education: input.education,
-      experience: input.experience,
+      phone: input.phone || "",
+      location: input.location || "",
+      linkedin: input.linkedin || "",
+      github: input.github || "",
+      portfolio: input.portfolio || "",
+      summary: input.summary || "",
+      education: input.education || [],
+      experience: input.experience || [],
       projects: input.projects || [],
       certifications: input.certifications || [],
-      skills: input.skills,
+      skills: input.skills || [],
       generated_resume: generatedResume,
+      template_id: input.templateId || "modern",
+      user_id: userId, // Explicitly set even if null
     };
 
-    if (userId) {
-      resumeRecord.user_id = userId;
-    }
+    // Initialize a new Supabase client with the user's auth token for this request
+    const dbClient = authHeader
+      ? createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: authHeader,
+            },
+          },
+        }
+      )
+      : supabase;
 
-    const { data: resume, error } = await supabase
+    const { data: resume, error } = await dbClient
       .from("resumes")
       .insert(resumeRecord)
       .select()
       .single();
 
     if (error) {
-      console.error("Supabase error:", error);
+      console.error("Supabase error during insert:", error);
       return NextResponse.json(
-        { error: `Failed to save resume: ${error.message} \nDetails: ${error.details}\nHint: ${error.hint}` },
+        { error: `Database Error: ${error.message}. Please check if you are logged in correctly.` },
         { status: 500 }
       );
     }

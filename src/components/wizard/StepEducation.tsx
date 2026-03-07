@@ -1,15 +1,47 @@
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/Input";
 import { ResumeFormValues } from "@/lib/schema";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Plus, Trash2, GripVertical, Sparkles, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 export function StepEducation() {
   const {
     control,
     register,
+    watch,
     formState: { errors },
   } = useFormContext<ResumeFormValues>();
+
+  const [isAILoading, setIsAILoading] = useState(false);
+  const [aiError, setAiError] = useState("");
+
+  const handleSuggestCertifications = async () => {
+    setIsAILoading(true);
+    setAiError("");
+    try {
+      const field = watch("education")?.[0]?.field || watch("jobTitle") || "Professional";
+      const response = await fetch("/api/ai-assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "certifications",
+          context: { field }
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to suggest certs");
+      
+      const suggestedCerts = data.result.split(",").map((s: string) => s.trim());
+      suggestedCerts.forEach((certName: string) => {
+        appendCert({ name: certName, issuer: "Industry standard", date: "", link: "" });
+      });
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "AI assist failed");
+    } finally {
+      setIsAILoading(false);
+    }
+  };
 
   // Education Array
   const {
@@ -139,21 +171,32 @@ export function StepEducation() {
             </h2>
             <p className="text-sm font-medium text-gray-400">Add any relevant professional certifications.</p>
           </div>
-          <button
-            type="button"
-            onClick={() =>
-              appendCert({
-                name: "",
-                issuer: "",
-                date: "",
-                link: "",
-              })
-            }
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600 hover:text-white hover:bg-gray-700"
-          >
-            <Plus className="w-4 h-4" />
-            Add Cert
-          </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={isAILoading}
+                onClick={handleSuggestCertifications}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors bg-violet-500/10 text-violet-400 border border-violet-500/30 hover:bg-violet-500/20"
+              >
+                {isAILoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                AI Suggest
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  appendCert({
+                    name: "",
+                    issuer: "",
+                    date: "",
+                    link: "",
+                  })
+                }
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600 hover:text-white hover:bg-gray-700"
+              >
+                <Plus className="w-4 h-4" />
+                Add Cert
+              </button>
+            </div>
         </div>
 
         <div className="space-y-5">

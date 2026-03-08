@@ -103,9 +103,9 @@ export function StepEducation() {
                 initial={{ opacity: 0, height: 0, y: -20 }}
                 animate={{ opacity: 1, height: "auto", y: 0 }}
                 exit={{ opacity: 0, height: 0, overflow: "hidden", transition: { duration: 0.2 } }}
-                className="rounded-3xl p-6 sm:p-8 relative group bg-gray-800/20 border border-gray-700/50 shadow-sm"
+                className="rounded-3xl p-5 sm:p-6 relative group bg-gray-800/20 border border-gray-700/50 shadow-sm"
               >
-                <div className="absolute top-6 left-4 cursor-grab text-gray-500 hover:text-gray-300 transition-colors">
+                <div className="absolute top-5 left-3 cursor-grab text-gray-500 hover:text-gray-300 transition-colors">
                   <GripVertical className="w-5 h-5 hidden sm:block" />
                 </div>
                 
@@ -113,14 +113,14 @@ export function StepEducation() {
                   <button
                     type="button"
                     onClick={() => removeEdu(index)}
-                    className="absolute top-5 right-5 p-2 rounded-xl transition-all text-gray-500 hover:text-red-400 hover:bg-red-500/10"
+                    className="absolute top-4 right-4 p-1.5 rounded-xl transition-all text-gray-500 hover:text-red-400 hover:bg-red-500/10"
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
                 )}
 
                 <div className="pl-0 sm:pl-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
                       <Input
                         label="Institution Name"
@@ -207,22 +207,22 @@ export function StepEducation() {
                 initial={{ opacity: 0, height: 0, y: -10 }}
                 animate={{ opacity: 1, height: "auto", y: 0 }}
                 exit={{ opacity: 0, height: 0, overflow: "hidden", transition: { duration: 0.2 } }}
-                className="rounded-2xl p-6 relative bg-gray-800/30 border border-gray-700"
+                className="rounded-2xl p-5 relative bg-gray-800/30 border border-gray-700"
               >
-                <div className="flex justify-between items-center mb-5 pl-0 sm:pl-2">
+                <div className="flex justify-between items-center mb-4 pl-0 sm:pl-2">
                    <h4 className="text-base font-bold text-gray-300">
                      Certification #{index + 1}
                    </h4>
                    <button
                     type="button"
                     onClick={() => removeCert(index)}
-                    className="p-2 rounded-lg transition-colors text-gray-500 hover:text-red-400 hover:bg-red-500/10"
+                    className="p-1.5 rounded-lg transition-colors text-gray-500 hover:text-red-400 hover:bg-red-500/10"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
                     label="Name"
                     placeholder="e.g. AWS Solutions Architect"

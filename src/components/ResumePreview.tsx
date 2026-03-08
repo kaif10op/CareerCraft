@@ -9,9 +9,10 @@ export type ResumeTemplate = string;
 interface ResumePreviewProps {
   content: string;
   template?: ResumeTemplate;
+  hideActions?: boolean;
 }
 
-export default function ResumePreview({ content, template = 'modern' }: ResumePreviewProps) {
+export default function ResumePreview({ content, template = 'modern', hideActions = false }: ResumePreviewProps) {
   // Styles based on selected template config
   const templateConfig = templates.find(t => t.id === template) || templates[0];
   const styles = templateConfig.styles;
@@ -161,22 +162,24 @@ export default function ResumePreview({ content, template = 'modern' }: ResumePr
   return (
     <div>
       {/* Action bar (hidden in print) */}
-      <div data-print-hide className="mb-6 flex gap-3">
-        <button
-          onClick={handlePrint}
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-medium hover:from-violet-500 hover:to-cyan-500 transition-all shadow-lg shadow-violet-500/25 flex items-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-          </svg>
-          Download as PDF
-        </button>
-      </div>
+      {!hideActions && (
+        <div data-print-hide className="mb-6 flex gap-3">
+          <button
+            onClick={handlePrint}
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-medium hover:from-violet-500 hover:to-cyan-500 transition-all shadow-lg shadow-violet-500/25 flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Download as PDF
+          </button>
+        </div>
+      )}
 
       {/* Resume content */}
       <div
         id="resume-content"
-        className="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-[800px] mx-auto transition-all"
+        className="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-[800px] mx-auto transition-all print:shadow-none print:p-0 print:m-0 print:max-w-none"
       >
         <div
           className={`resume-preview max-w-none ${styles.body}`}
@@ -209,15 +212,15 @@ export default function ResumePreview({ content, template = 'modern' }: ResumePr
           )}
 
           {templateConfig.layout === "sidebar-left" && (
-            <div className="flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border" style={{ borderColor: styles.color.border }}>
-              <div className="w-full sm:w-[32%] shrink-0 bg-gray-50/50 p-6 sm:p-8 border-b sm:border-b-0 sm:border-r" style={{ borderColor: styles.color.border, minHeight: '100%' }}>
+            <div className="flex flex-col sm:flex-row print:flex-row gap-0 rounded-lg overflow-hidden border" style={{ borderColor: styles.color.border }}>
+              <div className="w-full sm:w-[32%] print:w-[32%] shrink-0 bg-gray-50/50 p-6 sm:p-8 border-b sm:border-b-0 print:border-b-0 sm:border-r print:border-r" style={{ borderColor: styles.color.border, minHeight: '100%' }}>
                 <div className="mb-8 hidden sm:block">
                    <Markdown>{parsedResume.header}</Markdown>
                 </div>
                 {leftColSections.map(renderSection)}
               </div>
-              <div className="w-full sm:w-[68%] p-6 sm:p-8 bg-white" style={{ minHeight: '100%' }}>
-                <div className="mb-8 sm:hidden">
+              <div className="w-full sm:w-[68%] print:w-[68%] p-6 sm:p-8 bg-white" style={{ minHeight: '100%' }}>
+                <div className="mb-8 sm:hidden print:hidden">
                    <Markdown>{parsedResume.header}</Markdown>
                 </div>
                 {mainColSectionsLeft.map(renderSection)}
@@ -226,14 +229,14 @@ export default function ResumePreview({ content, template = 'modern' }: ResumePr
           )}
 
           {templateConfig.layout === "sidebar-right" && (
-            <div className="flex flex-col sm:flex-row gap-8 mt-6">
-              <div className="w-full sm:w-[68%]">
+            <div className="flex flex-col sm:flex-row print:flex-row gap-8 mt-6">
+              <div className="w-full sm:w-[68%] print:w-[68%]">
                 <div className="mb-8 border-b pb-6" style={{ borderColor: styles.color.border }}>
                    <Markdown>{parsedResume.header}</Markdown>
                 </div>
                 {mainColSectionsRight.map(renderSection)}
               </div>
-              <div className="w-full sm:w-[32%] shrink-0">
+              <div className="w-full sm:w-[32%] print:w-[32%] shrink-0">
                 <div className="bg-gray-50 p-6 rounded-xl border h-full" style={{ borderColor: styles.color.border }}>
                   {rightColSections.map(renderSection)}
                 </div>
@@ -246,7 +249,7 @@ export default function ResumePreview({ content, template = 'modern' }: ResumePr
               <div className="mb-8 border-b-2 pb-6" style={{ borderColor: styles.color.border }}>
                  <Markdown>{parsedResume.header}</Markdown>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-8">
                 {parsedResume.sections.map((section) => (
                   <div key={`card-${section.id}`} className="shadow-sm border p-6 rounded-xl bg-white flex flex-col" style={{ borderColor: styles.color.border }}>
                     {renderSection(section)}

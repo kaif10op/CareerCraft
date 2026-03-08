@@ -6,9 +6,10 @@ import { Check } from "lucide-react";
 interface StepperProps {
   steps: { id: string; title: string }[];
   currentStep: number;
+  onStepClick?: (stepIndex: number) => void;
 }
 
-export function Stepper({ steps, currentStep }: StepperProps) {
+export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
   return (
     <div className="w-full">
       {/* Step circles + progress bar */}
@@ -39,13 +40,20 @@ export function Stepper({ steps, currentStep }: StepperProps) {
           return (
             <div key={step.id} className="relative z-10 flex flex-col items-center">
               <motion.div
+                onClick={() => {
+                  if ((isCompleted || isCurrent) && onStepClick) {
+                    onStepClick(index);
+                  }
+                }}
                 initial={false}
                 animate={{
                   backgroundColor: isCompleted || isCurrent ? "#8b5cf6" : "#1f2937",
                   borderColor: isCompleted || isCurrent ? "#8b5cf6" : "#374151",
                   scale: isCurrent ? 1.1 : 1,
                 }}
-                className="w-8 h-8 rounded-full border-2 flex items-center justify-center"
+                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${
+                  isCompleted || isCurrent ? "cursor-pointer" : "cursor-not-allowed opacity-70"
+                }`}
                 style={{
                   boxShadow: isCurrent ? "0 4px 14px rgba(139, 92, 246, 0.3)" : "none",
                 }}
@@ -77,7 +85,14 @@ export function Stepper({ steps, currentStep }: StepperProps) {
           return (
             <span
               key={step.id}
-              className="text-xs font-medium text-center hidden sm:block"
+              onClick={() => {
+                if ((isCompleted || isCurrent) && onStepClick) {
+                  onStepClick(index);
+                }
+              }}
+              className={`text-xs font-medium text-center hidden sm:block ${
+                isCompleted || isCurrent ? "cursor-pointer hover:text-white transition-colors" : ""
+              }`}
               style={{
                 color: isCurrent ? "#c4b5fd" : isCompleted ? "#d1d5db" : "#4b5563",
                 width: `${100 / steps.length}%`,

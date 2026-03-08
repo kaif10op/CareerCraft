@@ -41,6 +41,10 @@ export function StepSkills() {
     );
   };
 
+  const clearAllSkills = () => {
+    setValue("skills", [], { shouldValidate: true });
+  };
+
   const handleAISuggest = async () => {
     setIsAILoading(true);
     setAiError("");
@@ -69,14 +73,15 @@ export function StepSkills() {
         throw new Error(data.error || "Failed to suggest skills");
       }
 
-      // Parse the comma-separated skills and merge with existing
+      // Parse the comma-separated or newline-separated skills and merge with existing
       const suggestedSkills = data.result
-        .split(",")
-        .map((s: string) => s.trim())
-        .filter((s: string) => s.length > 0 && !skills.includes(s));
+        .split(/[\n,]+/)
+        .map((s: string) => s.replace(/^[-*•\s]+/, '').trim())
+        .filter((s: string) => s.length > 0 && !skills.includes(s))
+        .slice(0, 15); // limit to 15 per click to prevent overflow
 
       if (suggestedSkills.length > 0) {
-        const uniqueSkills = Array.from(new Set([...skills, ...suggestedSkills]));
+        const uniqueSkills = Array.from(new Set([...skills, ...suggestedSkills])).slice(0, 30); // max 30 total
         setValue("skills", uniqueSkills, { shouldValidate: true });
       }
     } catch (err) {
@@ -105,7 +110,7 @@ export function StepSkills() {
         </p>
       </div>
 
-      <div className="rounded-3xl p-6 sm:p-8 bg-gray-800/20 border border-gray-700/50 shadow-sm">
+      <div className="rounded-3xl p-5 sm:p-6 bg-gray-800/20 border border-gray-700/50 shadow-sm">
         <div className="relative mb-6">
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
             <Code2 className="w-5 h-5" />
@@ -120,25 +125,38 @@ export function StepSkills() {
           />
         </div>
 
-        {/* AI Suggest Button */}
-        <button
-          type="button"
-          disabled={isAILoading}
-          onClick={handleAISuggest}
-          className="ai-btn mb-6 flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-300 border border-violet-500/40 hover:border-violet-400 hover:text-white"
-        >
-          {isAILoading ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Suggesting...
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4" />
-              ✨ Suggest Skills with AI
-            </>
+        {/* AI Suggest & Clear Buttons */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <button
+            type="button"
+            disabled={isAILoading}
+            onClick={handleAISuggest}
+            className="ai-btn flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-300 border border-violet-500/40 hover:border-violet-400 hover:text-white"
+          >
+            {isAILoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Suggesting...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4" />
+                ✨ Suggest Skills
+              </>
+            )}
+          </button>
+          
+          {skills.length > 0 && (
+            <button
+              type="button"
+              onClick={clearAllSkills}
+              className="px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 hover:text-red-300 flex items-center gap-2"
+            >
+              <X className="w-4 h-4" />
+              Clear All ({skills.length})
+            </button>
           )}
-        </button>
+        </div>
 
         {aiError && (
           <div className="mb-5 p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400">
@@ -154,8 +172,8 @@ export function StepSkills() {
 
         <div className="min-h-[200px] pt-6 mt-4 border-t border-gray-800">
           {skills.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full gap-3 mt-8 text-gray-500">
-              <Code2 className="w-12 h-12 opacity-30" />
+            <div className="flex flex-col items-center justify-center h-[160px] gap-3 text-gray-500">
+              <Code2 className="w-10 h-10 opacity-30" />
               <p className="font-medium text-sm">No skills added yet. Type above or click &quot;Suggest Skills with AI&quot;.</p>
             </div>
           ) : (
@@ -168,9 +186,9 @@ export function StepSkills() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     layout
-                    className="flex items-center gap-2 pl-4 pr-2 py-2.5 rounded-full text-sm font-bold transition-colors bg-violet-500/10 border border-violet-500/30 text-violet-300"
+                    className="flex items-center gap-2 pl-4 pr-2 py-2.5 rounded-full text-sm font-bold transition-colors bg-violet-500/10 border border-violet-500/30 text-violet-300 max-w-[250px]"
                   >
-                    {skill}
+                    <span className="truncate flex-1" title={skill}>{skill}</span>
                     <button
                       type="button"
                       onClick={() => removeSkill(skill)}

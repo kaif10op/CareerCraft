@@ -175,7 +175,7 @@ export function LivePreview() {
             {data.skills.map((skill, i) => (
               <span
                 key={i}
-                className="text-[13px] font-medium px-3 py-1 rounded-md text-gray-700 bg-gray-100 border border-gray-200"
+                className="text-[13px] font-medium px-3 py-1 rounded-md text-gray-700 bg-gray-100 border border-gray-200 break-words max-w-full"
               >
                 {skill}
               </span>

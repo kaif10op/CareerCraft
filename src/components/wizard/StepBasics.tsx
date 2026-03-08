@@ -110,12 +110,11 @@ export function StepBasics() {
         </button>
       </div>
 
-      {/* Role Selector */}
-      <div className="mb-8">
-        <label className="block text-sm font-semibold mb-4 text-gray-300">
+      <div className="mb-6">
+        <label className="block text-sm font-semibold mb-3 text-gray-300">
           I am a...
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="flex flex-wrap gap-2">
           {ROLE_OPTIONS.map((option) => {
             const isSelected = selectedRole === option.value;
             return (
@@ -123,25 +122,20 @@ export function StepBasics() {
                 key={option.value}
                 type="button"
                 onClick={() => setValue("role", option.value, { shouldValidate: true })}
-                className={`text-left p-5 rounded-2xl transition-all duration-200 border-2 ${
+                className={`flex-1 min-w-[120px] sm:min-w-0 py-2.5 px-4 rounded-xl text-sm font-bold transition-all border ${
                   isSelected
-                    ? "border-violet-500 bg-violet-500/10 shadow-[0_10px_20px_-5px_rgba(139,92,246,0.15)]"
-                    : "border-gray-800 bg-gray-900/40 hover:border-gray-700 hover:bg-gray-800/50"
+                    ? "border-violet-500 bg-violet-500/10 text-violet-300 shadow-[0_4px_10px_-2px_rgba(139,92,246,0.15)]"
+                    : "border-gray-800 bg-gray-900/40 text-gray-400 hover:border-gray-700 hover:text-white"
                 }`}
               >
-                <div className={`text-base font-bold mb-1 ${isSelected ? 'text-violet-300' : 'text-white'}`}>
-                  {option.label}
-                </div>
-                <div className="text-sm text-gray-400 leading-relaxed font-medium">
-                  {option.description}
-                </div>
+                {option.label}
               </button>
             );
           })}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           label="Full Name *"
           placeholder="e.g. John Doe"

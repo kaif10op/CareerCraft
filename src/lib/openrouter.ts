@@ -59,31 +59,31 @@ const providers: AIProvider[] = [
 function buildPrompt(input: ResumeInput): string {
   const role = (input as any).role || "professional";
 
-  const educationText = input.education && input.education.length > 0
+  const educationText = input.education && input.education.length > 0 && input.education[0].institution
     ? input.education
       .map((e) => `- ${e.degree} in ${e.field} from ${e.institution} (${e.startYear} - ${e.endYear})`)
       .join("\n")
-    : "None provided.";
+    : "";
 
-  const experienceText = input.experience && input.experience.length > 0
+  const experienceText = input.experience && input.experience.length > 0 && input.experience[0].company
     ? input.experience
       .map((e) => `- ${e.position} at ${e.company} (${e.startDate} - ${e.endDate}): ${e.description}`)
       .join("\n")
-    : "None provided.";
+    : "";
 
-  const projectsText = input.projects && input.projects.length > 0
+  const projectsText = input.projects && input.projects.length > 0 && input.projects[0].name
     ? input.projects.map(
       (p) => `- ${p.name}${p.techStack ? ` (${p.techStack})` : ""}: ${p.description}${p.link ? ` [Link](${p.link})` : ""}`
     ).join("\n")
-    : "None provided.";
+    : "";
 
-  const certsText = input.certifications && input.certifications.length > 0
+  const certsText = input.certifications && input.certifications.length > 0 && input.certifications[0].name
     ? input.certifications.map(
       (c) => `- ${c.name} by ${c.issuer} (${c.date})`
     ).join("\n")
-    : "None provided.";
+    : "";
 
-  const skillsText = input.skills && input.skills.length > 0 ? input.skills.join(", ") : "None provided.";
+  const skillsText = input.skills && input.skills.length > 0 && input.skills[0] ? input.skills.join(", ") : "";
 
   // Role-specific instructions
   let roleInstructions = "";
@@ -131,7 +131,7 @@ DO NOT include any conversational text, introductory thoughts, or explanations. 
 3. Do NOT use multi-level nesting (\`###\`, \`####\`) for sections. Keep structural hierarchy simple.
 4. For Work Experience and Projects, output the company/title/dates as bold plain text and use standard bullet points \`- \` for the descriptions.
 5. Emphasize action verbs, quantify achievements with metrics where possible, and remove fluff.
-6. IF A SECTION IS MARKED AS "None provided.", SKIP IT ENTIRELY. DO NOT create the section header.
+6. ONLY create headers/sections for the data explicitly provided below. If a section of data is missing or empty, DO NOT CREATE ITS HEADER at all.
 
 ${roleInstructions}
 ${templateInstructions}
@@ -149,20 +149,11 @@ ${input.portfolio ? `- Portfolio: ${input.portfolio}` : ""}
 **Professional Summary Details:**
 ${input.summary}
 
-**Work Experience:**
-${experienceText}
-
-**Education:**
-${educationText}
-
-**Projects:**
-${projectsText}
-
-**Certifications:**
-${certsText}
-
-**Skills:**
-${skillsText}
+${experienceText ? `**Work Experience:**\n${experienceText}\n` : ""}
+${educationText ? `**Education:**\n${educationText}\n` : ""}
+${projectsText ? `**Projects:**\n${projectsText}\n` : ""}
+${certsText ? `**Certifications:**\n${certsText}\n` : ""}
+${skillsText ? `**Skills:**\n${skillsText}\n` : ""}
 
 Remember, output strictly Markdown and apply ATS-optimization to the candidate's raw text. Avoid excessive bolding within bullet points.`;
 }

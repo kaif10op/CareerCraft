@@ -186,26 +186,42 @@ export default function ResumeForm() {
 
   return (
     <FormProvider {...methods}>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start relative mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] xl:grid-cols-[1fr_1.2fr] gap-6 lg:gap-8 items-stretch h-full min-h-0 pb-2">
 
         {/* Left Side: The Wizard Form */}
-        <div className="relative flex flex-col h-full min-h-[600px] w-full isolate">
+        <div className="relative flex flex-col h-full min-h-0 w-full isolate">
           {/* Subtle Outer Glow behind form */}
           <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/20 to-cyan-600/20 blur-2xl opacity-50 -z-10 rounded-3xl" />
           
-          <div className="flex flex-col h-full rounded-3xl overflow-hidden relative bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.05)]">
+          <div className="flex flex-col h-full min-h-0 rounded-3xl overflow-hidden relative bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.05)]">
             {/* Decorative top gradient */}
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-violet-500 via-purple-500 to-cyan-500 shadow-[0_0_10px_rgba(139,92,246,0.8)]" />
 
-            <div className="px-8 pt-8 pb-4 border-b border-white/5 bg-white/[0.01]">
-              <Stepper steps={STEPS} currentStep={currentStep} />
+            <div className="px-8 pt-6 pb-4 border-b border-white/5 bg-white/[0.01] shrink-0">
+              <Stepper 
+                steps={STEPS} 
+                currentStep={currentStep} 
+                onStepClick={(stepIndex) => {
+                  if (stepIndex <= currentStep || isValid) {
+                    setCurrentStep(stepIndex);
+                    formContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+                  } else {
+                    trigger(STEPS[currentStep].fields as any).then((isValid) => {
+                      if (isValid) {
+                         setCurrentStep(stepIndex);
+                         formContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+                      }
+                    });
+                  }
+                }} 
+              />
             </div>
 
           <form
             onSubmit={handleSubmit(onSubmit, onInvalid)}
-            className="flex flex-col flex-1 max-h-[70vh]"
+            className="flex flex-col flex-1 min-h-0 overflow-hidden"
           >
-            <div ref={formContainerRef} className="flex-1 p-8 overflow-y-auto custom-scrollbar relative scroll-smooth">
+            <div ref={formContainerRef} className="flex-1 min-h-0 overflow-y-auto px-6 py-6 sm:px-8 custom-scrollbar relative scroll-smooth bg-gray-950/20">
               {apiError && (
                 <div className="mb-6 p-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm animate-in fade-in slide-in-from-top-2">
                   <div className="flex items-center gap-3 mb-2">
@@ -255,7 +271,8 @@ export default function ResumeForm() {
               </AnimatePresence>
             </div>
 
-            <div className="p-6 flex items-center justify-between border-t border-white/5 bg-white/[0.01] backdrop-blur-md">
+            {/* Action Buttons Pinned to Bottom */}
+            <div className="p-4 sm:p-5 flex items-center justify-between border-t border-white/5 bg-gray-900/90 backdrop-blur-xl z-20 shrink-0">
               <button
                 type="button"
                 onClick={handlePrevious}
@@ -300,9 +317,9 @@ export default function ResumeForm() {
         </div>
 
         {/* Right Side: Live Preview (Hidden on mobile) */}
-        <div className="hidden lg:flex flex-col gap-6 sticky top-24 h-[calc(100vh-120px)] animate-in fade-in slide-in-from-right-8 duration-700 delay-300">
+        <div className="hidden lg:flex flex-col gap-4 h-full min-h-0 animate-in fade-in slide-in-from-right-8 duration-700 delay-300">
            {currentStep > 0 && <AtsInsights />}
-           <div className="flex-1 rounded-3xl overflow-hidden bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex-col relative group">
+           <div className="flex-1 min-h-0 rounded-3xl overflow-hidden bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex-col relative group">
               {/* Desk surface ambient glow */}
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-violet-500/5 pointer-events-none" />
               <LivePreview />

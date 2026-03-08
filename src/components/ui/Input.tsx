@@ -12,7 +12,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, icon, className = "", ...props }, ref) => {
     return (
       <div className={`w-full ${className}`}>
-        <label className="block text-sm font-semibold mb-2 ml-1 text-gray-300">
+        <label className="block text-sm font-semibold mb-1.5 ml-1 text-gray-300">
           {label}
         </label>
         <div className="relative group">
@@ -23,7 +23,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
           <input
             ref={ref}
-            className={`w-full rounded-2xl px-4 py-3.5 transition-all outline-none bg-gray-900/50 text-white placeholder-gray-500 shadow-inner ${
+            className={`w-full rounded-2xl px-4 py-2.5 transition-all outline-none bg-gray-900/50 text-white placeholder-gray-500 shadow-inner ${
               icon ? "pl-12" : ""
             } ${
               error

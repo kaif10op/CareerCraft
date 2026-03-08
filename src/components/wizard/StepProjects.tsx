@@ -101,26 +101,26 @@ export function StepProjects() {
               initial={{ opacity: 0, height: 0, y: -20 }}
               animate={{ opacity: 1, height: "auto", y: 0 }}
               exit={{ opacity: 0, height: 0, overflow: "hidden", transition: { duration: 0.2 } }}
-              className="rounded-3xl p-6 sm:p-8 relative group bg-gray-800/20 border border-gray-700/50 shadow-sm"
+              className="rounded-3xl p-5 sm:p-6 relative group bg-gray-800/20 border border-gray-700/50 shadow-sm"
             >
-              <div className="absolute top-6 left-4 cursor-grab text-gray-500 hover:text-gray-300 transition-colors">
+              <div className="absolute top-5 left-3 cursor-grab text-gray-500 hover:text-gray-300 transition-colors">
                 <GripVertical className="w-5 h-5 hidden sm:block" />
               </div>
               
               <button
                 type="button"
                 onClick={() => remove(index)}
-                className="absolute top-5 right-5 p-2 rounded-xl transition-all text-gray-500 hover:text-red-400 hover:bg-red-500/10"
+                className="absolute top-4 right-4 p-1.5 rounded-xl transition-all text-gray-500 hover:text-red-400 hover:bg-red-500/10"
                 title="Remove Project"
               >
                 <Trash2 className="w-5 h-5" />
               </button>
 
               <div className="pl-0 sm:pl-6">
-                <h3 className="text-xl font-bold mb-5 text-white">
+                <h3 className="text-lg font-bold mb-4 text-white">
                   Project #{index + 1}
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <Input
                     label="Project Name"
                     placeholder="e.g. Carrier Craft"

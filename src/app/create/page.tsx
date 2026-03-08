@@ -8,26 +8,10 @@ export const metadata = {
 export default function CreatePage() {
   return (
     <main
-      className="min-h-screen pt-28 pb-16"
+      className="h-screen pt-20 pb-0 overflow-hidden flex flex-col"
       style={{ backgroundColor: "#030712" }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4" style={{ color: "#ffffff" }}>
-            Create Your{" "}
-            <span
-              style={{
-                color: "#ffffff",
-              }}
-            >
-              Resume
-            </span>
-          </h1>
-          <p className="text-lg" style={{ color: "#9ca3af" }}>
-            Fill in your details below and our AI will craft a professional,
-            ATS-optimized resume for you.
-          </p>
-        </div>
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 xl:px-8 flex-1 flex flex-col min-h-0 bg-gray-950">
         <ResumeForm />
       </div>
     </main>

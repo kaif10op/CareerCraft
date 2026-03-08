@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, LogOut, LogIn } from "lucide-react";
+import { Menu, X, LogOut, LogIn, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "./Logo";
 import AuthModal from "./AuthModal";
+import UserMenu from "./UserMenu";
 import { supabase } from "@/lib/supabase";
 
 export default function Navbar() {
@@ -49,13 +50,7 @@ export default function Navbar() {
               <div className="h-6 w-px bg-gray-800" />
               
               {user ? (
-                <button
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white transition-colors cursor-pointer border-none bg-transparent"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
+                <UserMenu user={user} onSignOut={handleSignOut} />
               ) : (
                 <button
                   onClick={() => setIsAuthModalOpen(true)}
@@ -120,13 +115,23 @@ export default function Navbar() {
                     transition={{ delay: 0.3 }}
                   >
                     {user ? (
-                      <button
-                        onClick={handleSignOut}
-                        className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-400/10 transition-all cursor-pointer border-none bg-transparent"
-                      >
-                        <LogOut className="w-5 h-5" />
-                        Sign Out
-                      </button>
+                      <>
+                        <Link
+                          href="/profile"
+                          className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium text-violet-400 hover:bg-violet-400/10 transition-all cursor-pointer border-none bg-transparent mb-1"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <User className="w-5 h-5" />
+                          Your Profile
+                        </Link>
+                        <button
+                          onClick={handleSignOut}
+                          className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-400/10 transition-all cursor-pointer border-none bg-transparent"
+                        >
+                          <LogOut className="w-5 h-5" />
+                          Sign Out
+                        </button>
+                      </>
                     ) : (
                       <button
                         onClick={() => {

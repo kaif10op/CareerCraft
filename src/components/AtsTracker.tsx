@@ -1,18 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { calculateAtsScore, AtsResult } from "@/utils/atsScoring";
 import { CheckCircle2, AlertTriangle, XCircle, ChevronDown, ChevronUp } from "lucide-react";
 
 export function AtsTracker({ resumeContent }: { resumeContent: string }) {
-  const [result, setResult] = useState<AtsResult | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    if (resumeContent) {
-      setResult(calculateAtsScore(resumeContent));
-    }
+  const result = useMemo(() => {
+    return resumeContent ? calculateAtsScore(resumeContent) : null;
   }, [resumeContent]);
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!result) return null;
 

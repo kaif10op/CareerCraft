@@ -101,7 +101,6 @@ html {
 }
 
 body {
-  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   background-color: #030712; /* gray-950 */
   color: #f9fafb; /* gray-50 */

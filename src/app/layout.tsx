@@ -25,10 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} antialiased min-h-screen bg-gray-950 text-white print:min-h-0 print:bg-white print:text-black`}
-        style={{
-          fontFamily: "'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif",
-        }}
+        className={`${inter.className} antialiased min-h-screen bg-gray-950 text-white print:min-h-0 print:bg-white print:text-black`}
       >
         <Navbar />
         {children}

@@ -6,6 +6,66 @@ import rehypeRaw from 'rehype-raw';
 
 export type ResumeTemplate = string;
 
+interface MarkdownProps {
+  children: string;
+  className?: string;
+  styles: any;
+}
+
+// Optimized Markdown Component - Moved outside to prevent re-creation during render
+const Markdown = ({ children, className = "", styles }: MarkdownProps) => {
+  return (
+    <div className={className}>
+      <ReactMarkdown
+        rehypePlugins={[rehypeRaw]}
+        components={{
+          h1: ({ ...props }) => {
+            const hasExplicitColor = styles.h1.includes('text-white') || styles.h1.includes('text-gray-') || styles.h1.includes('text-black');
+            const colorStyle = hasExplicitColor ? {} : { color: styles.color.heading };
+            return <h1 className={styles.h1} style={colorStyle} {...props} />;
+          },
+          h2: ({ ...props }) => (
+            <h2 className={styles.h2} style={{ color: styles.color.heading, borderColor: styles.color.border }} {...props} />
+          ),
+          h3: ({ ...props }) => (
+            <h3 className={styles.h3} style={{ color: styles.color.heading }} {...props} />
+          ),
+          hr: ({ ...props }) => (
+            <hr className={styles.hr} style={{ borderColor: styles.color.border }} {...props} />
+          ),
+          p: ({ ...props }) => (
+            <p className="mb-4 leading-relaxed whitespace-pre-wrap" style={{ color: styles.color.text }} {...props} />
+          ),
+          ul: ({ ...props }) => (
+            <ul className="list-disc mb-6 ml-4" style={{ color: styles.color.text }} {...props} />
+          ),
+          ol: ({ ...props }) => (
+            <ol className="list-decimal mb-6 ml-4" style={{ color: styles.color.text }} {...props} />
+          ),
+          li: ({ ...props }) => {
+            // Check if content is bold (likely a sub-header/title bullet)
+            const hasBold = Array.isArray(props.children) && 
+              props.children.some((child: any) => child?.type === 'strong' || (typeof child === 'string' && child.includes('**')));
+            const liClass = hasBold ? "ml-4 mb-3 pl-2 leading-relaxed list-none font-semibold" : "ml-4 mb-2 pl-2 list-[circle]";
+            return <li className={liClass} style={{ color: styles.color.text }} {...props} />;
+          },
+          strong: ({ ...props }) => (
+            <strong style={{ color: styles.color.heading }} {...props} />
+          ),
+          em: ({ ...props }) => (
+            <em style={{ color: styles.color.muted }} {...props} />
+          ),
+          a: ({ ...props }) => (
+            <a target="_blank" rel="noopener noreferrer" className="hover:underline font-medium relative z-10" style={{ color: 'inherit' }} {...props} />
+          ),
+        }}
+      >
+        {children}
+      </ReactMarkdown>
+    </div>
+  );
+};
+
 interface ResumePreviewProps {
   content: string;
   template?: ResumeTemplate;
@@ -16,60 +76,6 @@ export default function ResumePreview({ content, template = 'modern', hideAction
   // Styles based on selected template config
   const templateConfig = templates.find(t => t.id === template) || templates[0];
   const styles = templateConfig.styles;
-
-  // Optimized Markdown Component
-  const Markdown = ({ children, className = "" }: { children: string, className?: string }) => {
-    return (
-      <div className={className}>
-        <ReactMarkdown
-          rehypePlugins={[rehypeRaw]}
-          components={{
-            h1: ({ node, ...props }) => {
-              const hasExplicitColor = styles.h1.includes('text-white') || styles.h1.includes('text-gray-') || styles.h1.includes('text-black');
-              const colorStyle = hasExplicitColor ? {} : { color: styles.color.heading };
-              return <h1 className={styles.h1} style={colorStyle} {...props} />;
-            },
-            h2: ({ node, ...props }) => (
-              <h2 className={styles.h2} style={{ color: styles.color.heading, borderColor: styles.color.border }} {...props} />
-            ),
-            h3: ({ node, ...props }) => (
-              <h3 className={styles.h3} style={{ color: styles.color.heading }} {...props} />
-            ),
-            hr: ({ node, ...props }) => (
-              <hr className={styles.hr} style={{ borderColor: styles.color.border }} {...props} />
-            ),
-            p: ({ node, ...props }) => (
-              <p className="mb-4 leading-relaxed whitespace-pre-wrap" style={{ color: styles.color.text }} {...props} />
-            ),
-            ul: ({ node, ...props }) => (
-              <ul className="list-disc mb-6 ml-4" style={{ color: styles.color.text }} {...props} />
-            ),
-            ol: ({ node, ...props }) => (
-              <ol className="list-decimal mb-6 ml-4" style={{ color: styles.color.text }} {...props} />
-            ),
-            li: ({ node, ...props }) => {
-              // Check if content is bold (likely a sub-header/title bullet)
-              const hasBold = Array.isArray(props.children) && 
-                props.children.some((child: any) => child?.type === 'strong' || (typeof child === 'string' && child.includes('**')));
-              const liClass = hasBold ? "ml-4 mb-3 pl-2 leading-relaxed list-none font-semibold" : "ml-4 mb-2 pl-2 list-[circle]";
-              return <li className={liClass} style={{ color: styles.color.text }} {...props} />;
-            },
-            strong: ({ node, ...props }) => (
-              <strong style={{ color: styles.color.heading }} {...props} />
-            ),
-            em: ({ node, ...props }) => (
-              <em style={{ color: styles.color.muted }} {...props} />
-            ),
-            a: ({ node, ...props }) => (
-              <a target="_blank" rel="noopener noreferrer" className="hover:underline font-medium relative z-10" style={{ color: 'inherit' }} {...props} />
-            ),
-          }}
-        >
-          {children}
-        </ReactMarkdown>
-      </div>
-    );
-  };
 
   // NEW PARSING LOGIC: Split the markdown into structural chunks
   const parseMarkdownSections = (md: string) => {
@@ -154,7 +160,7 @@ export default function ResumePreview({ content, template = 'modern', hideAction
   const renderSection = (section: { id: string; title: string; content: string }) => {
     return (
       <div key={section.id} className="mb-2">
-        <Markdown>{`## ${section.title}\n${section.content}`}</Markdown>
+        <Markdown styles={styles}>{`## ${section.title}\n${section.content}`}</Markdown>
       </div>
     );
   };
@@ -188,7 +194,7 @@ export default function ResumePreview({ content, template = 'modern', hideAction
           {/* Conditional Layout Rendering */}
           {templateConfig.layout === "linear" && (
             <div className="flex flex-col">
-              <Markdown>{parsedResume.header}</Markdown>
+              <Markdown styles={styles}>{parsedResume.header}</Markdown>
               {parsedResume.sections.map(renderSection)}
             </div>
           )}
@@ -196,7 +202,7 @@ export default function ResumePreview({ content, template = 'modern', hideAction
           {templateConfig.layout === "executive" && (
             <div className="flex flex-col mx-auto max-w-[95%]">
               <div className="text-center mb-8 pb-4 border-b-2" style={{ borderColor: styles.color.border }}>
-                 <Markdown className="[&_h1]:text-center [&_p]:text-center">{parsedResume.header}</Markdown>
+                 <Markdown styles={styles} className="[&_h1]:text-center [&_p]:text-center">{parsedResume.header}</Markdown>
               </div>
               {parsedResume.sections.map(renderSection)}
             </div>
@@ -205,7 +211,7 @@ export default function ResumePreview({ content, template = 'modern', hideAction
           {templateConfig.layout === "split-header" && (
             <div className="flex flex-col">
               <div className="bg-gray-100 p-8 rounded-lg mb-8 border-l-8" style={{ borderColor: styles.color.heading }}>
-                 <Markdown>{parsedResume.header}</Markdown>
+                 <Markdown styles={styles}>{parsedResume.header}</Markdown>
               </div>
               {parsedResume.sections.map(renderSection)}
             </div>
@@ -215,13 +221,13 @@ export default function ResumePreview({ content, template = 'modern', hideAction
             <div className="flex flex-col sm:flex-row print:flex-row gap-0 rounded-lg overflow-hidden border" style={{ borderColor: styles.color.border }}>
               <div className="w-full sm:w-[32%] print:w-[32%] shrink-0 bg-gray-50/50 p-6 sm:p-8 border-b sm:border-b-0 print:border-b-0 sm:border-r print:border-r" style={{ borderColor: styles.color.border, minHeight: '100%' }}>
                 <div className="mb-8 hidden sm:block">
-                   <Markdown>{parsedResume.header}</Markdown>
+                   <Markdown styles={styles}>{parsedResume.header}</Markdown>
                 </div>
                 {leftColSections.map(renderSection)}
               </div>
               <div className="w-full sm:w-[68%] print:w-[68%] p-6 sm:p-8 bg-white" style={{ minHeight: '100%' }}>
                 <div className="mb-8 sm:hidden print:hidden">
-                   <Markdown>{parsedResume.header}</Markdown>
+                   <Markdown styles={styles}>{parsedResume.header}</Markdown>
                 </div>
                 {mainColSectionsLeft.map(renderSection)}
               </div>
@@ -232,7 +238,7 @@ export default function ResumePreview({ content, template = 'modern', hideAction
             <div className="flex flex-col sm:flex-row print:flex-row gap-8 mt-6">
               <div className="w-full sm:w-[68%] print:w-[68%]">
                 <div className="mb-8 border-b pb-6" style={{ borderColor: styles.color.border }}>
-                   <Markdown>{parsedResume.header}</Markdown>
+                   <Markdown styles={styles}>{parsedResume.header}</Markdown>
                 </div>
                 {mainColSectionsRight.map(renderSection)}
               </div>
@@ -247,7 +253,7 @@ export default function ResumePreview({ content, template = 'modern', hideAction
           {templateConfig.layout === "two-column" && (
             <div className="flex flex-col">
               <div className="mb-8 border-b-2 pb-6" style={{ borderColor: styles.color.border }}>
-                 <Markdown>{parsedResume.header}</Markdown>
+                 <Markdown styles={styles}>{parsedResume.header}</Markdown>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-8">
                 {parsedResume.sections.map((section) => (

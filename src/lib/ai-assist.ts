@@ -1,8 +1,23 @@
 import { ResumeInput } from "@/types/resume";
 
+export interface AIAssistContext {
+    jobTitle?: string;
+    role?: string;
+    notes?: string;
+    skills?: string;
+    company?: string;
+    position?: string;
+    description?: string;
+    background?: string;
+    name?: string;
+    techStack?: string;
+    field?: string;
+    [key: string]: string | undefined;
+}
+
 export interface AIAssistRequest {
     type: "summary" | "experience" | "skills" | "projects" | "certifications" | "job_titles";
-    context: Record<string, any>;
+    context: AIAssistContext;
 }
 
 interface AIProvider {
@@ -14,18 +29,7 @@ interface AIProvider {
 
 const providers: AIProvider[] = [
     {
-        name: "OpenRouter (Preferred)",
-        url: "https://openrouter.ai/api/v1/chat/completions",
-        getHeaders: () => ({
-            Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://carrier-craft.vercel.app",
-            "X-Title": "Carrier Craft",
-        }),
-        model: process.env.AI_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
-    },
-    {
-        name: "Cerebras",
+        name: "Cerebras (Fastest)",
         url: "https://api.cerebras.ai/v1/chat/completions",
         getHeaders: () => ({
             Authorization: `Bearer ${process.env.CEREBRAS_API_KEY}`,
@@ -40,15 +44,26 @@ const providers: AIProvider[] = [
             Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
             "Content-Type": "application/json",
         }),
-        model: "llama3-8b-8192",
+        model: "llama-3.1-8b-instant",
+    },
+    {
+        name: "OpenRouter",
+        url: "https://openrouter.ai/api/v1/chat/completions",
+        getHeaders: () => ({
+            Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://carrier-craft.vercel.app",
+            "X-Title": "Carrier Craft",
+        }),
+        model: "meta-llama/llama-3.3-70b-instruct:free",
     },
     {
         name: "Gemini API (Direct)",
-        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_AI_KEY}`,
+        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GOOGLE_AI_KEY}`,
         getHeaders: () => ({
             "Content-Type": "application/json",
         }),
-        model: "gemini-2.0-flash",
+        model: "gemini-1.5-flash",
     },
 ];
 
@@ -71,7 +86,7 @@ export function buildSystemPrompt(type: string): string {
     }
 }
 
-export function buildUserPrompt(type: string, context: Record<string, any>): string {
+export function buildUserPrompt(type: string, context: AIAssistContext): string {
     switch (type) {
         case "summary":
             return `Write a professional summary for this person:
@@ -111,7 +126,7 @@ They currently listed their target title as: ${context.jobTitle || "None yet"}`;
     }
 }
 
-export async function getAIAssistResponse(type: AIAssistRequest["type"], context: Record<string, any>): Promise<string> {
+export async function getAIAssistResponse(type: AIAssistRequest["type"], context: AIAssistContext): Promise<string> {
     const systemPrompt = buildSystemPrompt(type);
     const userPrompt = buildUserPrompt(type, context);
     const errors: string[] = [];

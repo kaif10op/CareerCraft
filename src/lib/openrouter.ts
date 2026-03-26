@@ -9,6 +9,15 @@ interface AIProvider {
 
 const providers: AIProvider[] = [
   {
+    name: "Cerebras (Fastest)",
+    url: "https://api.cerebras.ai/v1/chat/completions",
+    getHeaders: () => ({
+      Authorization: `Bearer ${process.env.CEREBRAS_API_KEY}`,
+      "Content-Type": "application/json",
+    }),
+    model: "llama3.1-8b",
+  },
+  {
     name: "Groq",
     url: "https://api.groq.com/openai/v1/chat/completions",
     getHeaders: () => ({
@@ -18,24 +27,7 @@ const providers: AIProvider[] = [
     model: "llama-3.1-8b-instant",
   },
   {
-    name: "Cerebras",
-    url: "https://api.cerebras.ai/v1/chat/completions",
-    getHeaders: () => ({
-      Authorization: `Bearer ${process.env.CEREBRAS_API_KEY}`,
-      "Content-Type": "application/json",
-    }),
-    model: "llama3.1-8b",
-  },
-  {
-    name: "Gemini API (Direct)",
-    url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_AI_KEY}`,
-    getHeaders: () => ({
-      "Content-Type": "application/json",
-    }),
-    model: "gemini-2.0-flash",
-  },
-  {
-    name: "OpenRouter (Preferred)",
+    name: "OpenRouter",
     url: "https://openrouter.ai/api/v1/chat/completions",
     getHeaders: () => ({
       Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
@@ -44,6 +36,14 @@ const providers: AIProvider[] = [
       "X-Title": "Carrier Craft",
     }),
     model: process.env.AI_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
+  },
+  {
+    name: "Gemini API (Direct)",
+    url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GOOGLE_AI_KEY}`,
+    getHeaders: () => ({
+      "Content-Type": "application/json",
+    }),
+    model: "gemini-1.5-flash",
   },
   {
     name: "xAI (Grok)",

@@ -7,21 +7,21 @@
   {
     "name": "Groq",
     "success": true,
-    "time": "0.55s"
+    "time": "0.34s"
   },
   {
     "name": "Cerebras",
     "success": true,
-    "time": "0.89s"
+    "time": "0.97s"
   },
   {
     "name": "Gemini",
     "success": false,
-    "error": "429 - {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Qu..."
+    "error": "400 - {\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"AP..."
   },
   {
     "name": "xAI",
     "success": false,
-    "error": "403 - {\"code\":\"The caller does not have permission to ex..."
+    "error": "400 - {\"code\":\"Client specified an invalid argument\",\"er..."
   }
 ]

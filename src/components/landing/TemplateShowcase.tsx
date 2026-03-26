@@ -43,7 +43,7 @@ export default function TemplateShowcase() {
               A Layout for <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Every Career</span>
             </h2>
             <p className="text-xl text-gray-400">
-              Whether you're a creative designer, an executive, or a new grad, we have an ATS-optimized template designed specifically for your industry.
+              Whether you&apos;re a creative designer, an executive, or a new grad, we have an ATS-optimized template designed specifically for your industry.
             </p>
           </div>
           

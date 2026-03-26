@@ -2,11 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { User, LogOut, Settings, ChevronDown } from "lucide-react";
+import { User as LucideUser, LogOut, ChevronDown } from "lucide-react";
+import { User } from "@supabase/supabase-js";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface UserMenuProps {
-  user: any;
+  user: User | null;
   onSignOut: () => void;
 }
 
@@ -71,7 +72,7 @@ export default function UserMenu({ user, onSignOut }: UserMenuProps) {
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
             >
-              <User className="w-4 h-4 text-gray-400" />
+              <LucideUser className="w-4 h-4 text-gray-400" />
               Your Profile
             </Link>
 

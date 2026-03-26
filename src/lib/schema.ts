@@ -18,9 +18,9 @@ export const resumeSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
   location: z.string().optional(),
-  linkedin: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  github: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  portfolio: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  linkedin: z.string().url("Must be a valid URL").optional().or(z.literal("")).nullable(),
+  github: z.string().url("Must be a valid URL").optional().or(z.literal("")).nullable(),
+  portfolio: z.string().url("Must be a valid URL").optional().or(z.literal("")).nullable(),
 
   summary: z.string().min(10, "Summary should be at least 10 characters").max(2000, "Summary is too long"),
 
@@ -79,8 +79,8 @@ export const defaultValues: Partial<ResumeFormValues> = {
   github: "",
   portfolio: "",
   summary: "",
-  education: [{ institution: "", degree: "", field: "", startYear: "", endYear: "" }],
-  experience: [{ company: "", position: "", startDate: "", endDate: "", description: "" }],
+  education: [],
+  experience: [],
   projects: [],
   certifications: [],
   skills: [],

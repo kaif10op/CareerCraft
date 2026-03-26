@@ -28,6 +28,7 @@ export const templates: ResumeTemplate[] = [
     id: "modern",
     name: "Modern",
     description: "Clean sans-serif design with bold headings.",
+    thumbnail: "/templates/modern.png",
     layout: "linear",
     styles: {
       h1: "text-4xl font-extrabold mb-4 font-sans tracking-tight",

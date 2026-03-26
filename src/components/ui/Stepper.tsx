@@ -41,7 +41,7 @@ export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
             <div key={step.id} className="relative z-10 flex flex-col items-center">
               <motion.div
                 onClick={() => {
-                  if ((isCompleted || isCurrent) && onStepClick) {
+                  if (onStepClick) {
                     onStepClick(index);
                   }
                 }}
@@ -90,8 +90,8 @@ export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
                   onStepClick(index);
                 }
               }}
-              className={`text-xs font-medium text-center hidden sm:block ${
-                isCompleted || isCurrent ? "cursor-pointer hover:text-white transition-colors" : ""
+              className={`text-xs font-medium text-center hidden sm:block cursor-pointer hover:text-white transition-all ${
+                isCompleted || isCurrent ? "" : "opacity-60"
               }`}
               style={{
                 color: isCurrent ? "#c4b5fd" : isCompleted ? "#d1d5db" : "#4b5563",

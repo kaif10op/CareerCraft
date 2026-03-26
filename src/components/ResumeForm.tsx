@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, FieldErrors, FieldError } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { resumeSchema, ResumeFormValues, defaultValues } from "@/lib/schema";
 import { Stepper } from "@/components/ui/Stepper";
@@ -122,14 +122,14 @@ export default function ResumeForm() {
     }
   };
 
-  const onInvalid = (errors: any) => {
+  const onInvalid = (errors: FieldErrors<ResumeFormValues>) => {
     // Find the first field with an error
-    const firstErrorField = Object.keys(errors)[0];
+    const firstErrorField = Object.keys(errors)[0] as keyof ResumeFormValues;
     if (!firstErrorField) return;
 
     // Find which step this field belongs to
     // For arrays like experience.0.company, we just need the root key 'experience'
-    const rootKey = firstErrorField.split('.')[0];
+    const rootKey = (firstErrorField as string).split('.')[0];
     const stepIndex = STEPS.findIndex(step => step.fields.includes(rootKey));
     
     if (stepIndex !== -1 && stepIndex !== currentStep) {
@@ -147,11 +147,20 @@ export default function ResumeForm() {
 
     try {
       // Get a fresh session/user to avoid stale tokens
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      const { data: { session } } = await supabase.auth.getSession();
+      let user = null;
+      let session = null;
+      
+      try {
+        const { data: { user: authUser }, error: userError } = await supabase.auth.getUser();
+        const { data: { session: authSession } } = await supabase.auth.getSession();
+        user = authUser;
+        session = authSession;
 
-      if (userError) {
-        console.warn("User session verification failed:", userError);
+        if (userError) {
+          console.warn("User session verification failed:", userError);
+        }
+      } catch (e) {
+        console.warn("Supabase session check failed (backend might be down):", e);
       }
 
       const headers: HeadersInit = {
@@ -242,10 +251,10 @@ export default function ResumeForm() {
                     <h4 className="text-red-300 font-bold text-lg">Fix needed before proceeding</h4>
                   </div>
                   <ul className="space-y-2 ml-11">
-                    {Object.entries(methods.formState.errors).map(([key, error]: [string, any]) => (
+                    {Object.entries(methods.formState.errors).map(([key, error]) => (
                       <li key={key} className="text-sm text-red-400/80 flex items-center gap-2">
                         <span className="w-1 h-1 rounded-full bg-red-500/50" />
-                        <span className="font-bold capitalize">{key.replace(/([A-Z])/g, ' $1')}:</span> {error.message || "This field is required"}
+                        <span className="font-bold capitalize">{key.replace(/([A-Z])/g, ' $1')}:</span> {(error as FieldError).message || "This field is required"}
                       </li>
                     ))}
                   </ul>

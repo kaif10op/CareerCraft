@@ -18,19 +18,38 @@ export default function Navbar() {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
+    try {
+      supabase.auth.getSession().then(({ data: { session }, error }) => {
+        if (error) {
+          console.warn("Auth session error:", error.message);
+          setUser(null);
+        } else {
+          setUser(session?.user ?? null);
+        }
+      }).catch(err => {
+        console.warn("Caught Supabase fetch error in getSession:", err);
+        setUser(null);
+      });
+    } catch (e) {
+      console.error("Supabase getSession crash:", e);
+      setUser(null);
+    }
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        window.location.reload();
-      }
-    });
+    let subscription: any;
+    try {
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        setUser(session?.user ?? null);
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+          window.location.reload();
+        }
+      });
+      subscription = data?.subscription;
+    } catch (e) {
+      console.error("Supabase onAuthStateChange crash:", e);
+    }
 
-    return () => subscription.unsubscribe();
+    return () => subscription?.unsubscribe?.();
   }, []);
 
   async function handleSignOut() {

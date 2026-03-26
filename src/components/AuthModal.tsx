@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { X, Mail, Lock, Loader2, LogIn, UserPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -35,24 +36,43 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
 
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        console.log("Attempting signup for:", email);
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
-        if (error) throw error;
+        if (error) {
+          console.error("Signup error details:", error);
+          toast.error(error.message);
+          throw error;
+        }
+        console.log("Signup success:", data);
         setSuccess("Success! Please check your email for a confirmation link.");
-        // Don't close immediately on signup so they can read the message
+        toast.success("Check your email for confirmation link!");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        console.log("Attempting login for:", email);
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
-        onClose();
-        window.location.reload();
+        if (error) {
+          console.error("Login error details:", error);
+          toast.error(error.message);
+          throw error;
+        }
+        console.log("Login success:", data);
+        toast.success("Signed in successfully! Reloading...");
+        setTimeout(() => {
+          onClose();
+          window.location.reload();
+        }, 1500);
       }
-    } catch (err: any) {
-      setError(err.message || "Authentication failed");
+    } catch (err) {
+      const authError = err as { message?: string };
+      console.error("Full Auth Exception:", authError);
+      const message = authError.message || "Authentication failed";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

@@ -33,9 +33,9 @@ const providers: AIProvider[] = [
       Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
       "HTTP-Referer": "https://carrier-craft.vercel.app",
-      "X-Title": "CareerCraft",
+      "X-Title": "CarrierCraft",
     }),
-    model: process.env.AI_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
+    model: process.env.AI_MODEL || "google/gemini-2.5-flash:free",
   },
   {
     name: "Gemini API (Direct)",

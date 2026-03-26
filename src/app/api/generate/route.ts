@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { generateResume } from "@/lib/openrouter";
 import { supabase } from "@/lib/supabase";
+import { appCache } from "@/lib/cache";
 import { ResumeInput } from "@/types/resume";
 
 export async function POST(request: Request) {
@@ -95,6 +96,10 @@ export async function POST(request: Request) {
         { error: `Database Error: ${error.message}. Please check if you are logged in correctly.` },
         { status: 500 }
       );
+    }
+
+    if (userId) {
+      appCache.invalidate(`resumes_list_${userId}`);
     }
 
     return NextResponse.json({ id: resume.id, resume: generatedResume });

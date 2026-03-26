@@ -36,7 +36,7 @@ export default function Hero() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-8 bg-white/5 border border-white/10 text-gray-300 backdrop-blur-md shadow-2xl animate-float">
           <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)] animate-pulse" />
-          CareerCraft: Build your perfect career
+          CarrierCraft: Build your perfect career
         </div>
 
         {/* Heading */}

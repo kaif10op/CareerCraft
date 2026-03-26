@@ -68,7 +68,7 @@ export default function Logo({ className = "", iconOnly = false }: LogoProps) {
       {!iconOnly && (
         <span className="text-2xl font-black tracking-tighter text-white">
           <span className="bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent group-hover:from-violet-300 group-hover:to-cyan-300 transition-all duration-300">
-            Career
+            Carrier
           </span>
           <span className="text-violet-500 group-hover:text-cyan-400 transition-colors ml-0.5">Craft</span>
         </span>

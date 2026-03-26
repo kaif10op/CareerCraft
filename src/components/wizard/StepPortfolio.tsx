@@ -252,7 +252,7 @@ export function StepPortfolio() {
                 <div className="pl-0 sm:pl-6">
                   <h3 className="text-lg font-bold mb-4 text-white">Project #{index + 1}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <Input label="Project Name" placeholder="e.g. CareerCraft" {...register(`projects.${index}.name`)} error={errors.projects?.[index]?.name?.message} />
+                    <Input label="Project Name" placeholder="e.g. CarrierCraft" {...register(`projects.${index}.name`)} error={errors.projects?.[index]?.name?.message} />
                     <Input label="Link / Repository" placeholder="https://github.com/..." {...register(`projects.${index}.link`)} error={errors.projects?.[index]?.link?.message} />
                     <div className="md:col-span-2">
                       <Input label="Tech Stack (comma separated)" placeholder="e.g. React, Next.js, Tailwind, TypeScript" {...register(`projects.${index}.techStack`)} error={errors.projects?.[index]?.techStack?.message} />

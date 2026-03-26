@@ -16,6 +16,15 @@ export default function ResumesPage() {
   useEffect(() => {
     async function fetchResumes() {
       try {
+        // LAYER 0: Instant SessionStorage Cache for perceived performance
+        const cachedStr = sessionStorage.getItem("carrier_craft_resumes");
+        if (cachedStr) {
+          try {
+            setResumes(JSON.parse(cachedStr));
+            setLoading(false); // Make UI instant, continue fetching in background
+          } catch { /* ignore parse error */ }
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
         
         const headers: HeadersInit = {};
@@ -36,6 +45,7 @@ export default function ResumesPage() {
         }
         const data = await res.json();
         setResumes(data);
+        sessionStorage.setItem("carrier_craft_resumes", JSON.stringify(data));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong");
       } finally {

@@ -40,8 +40,8 @@ export default function Navbar() {
     try {
       const { data } = supabase.auth.onAuthStateChange((event, session) => {
         setUser(session?.user ?? null);
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-          window.location.reload();
+        if (event === 'SIGNED_OUT') {
+          router.push('/');
         }
       });
       subscription = data?.subscription;

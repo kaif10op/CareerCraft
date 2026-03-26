@@ -1,8 +1,9 @@
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { ResumeFormValues, ROLE_OPTIONS } from "@/lib/schema";
 import { useState } from "react";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, Info } from "lucide-react";
 
 export function StepBasics() {
   const {
@@ -13,6 +14,9 @@ export function StepBasics() {
   } = useFormContext<ResumeFormValues>();
 
   const selectedRole = watch("role") || "professional";
+  const summary = watch("summary") || "";
+  const jobTitle = watch("jobTitle") || "";
+  const skills = watch("skills") || [];
   const [isAILoading, setIsAILoading] = useState(false);
   const [aiError, setAiError] = useState("");
 
@@ -67,9 +71,35 @@ export function StepBasics() {
       if (!response.ok) throw new Error(data.error || "Failed to quick fill");
       
       setValue("summary", data.result, { shouldValidate: true });
-      // We could potentially fill more fields here if we had more AI types
     } catch (err) {
       setAiError(err instanceof Error ? err.message : "Quick fill failed");
+    } finally {
+      setIsAILoading(false);
+    }
+  };
+
+  const handleAISummary = async () => {
+    setIsAILoading(true);
+    setAiError("");
+    try {
+      const response = await fetch("/api/ai-assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "summary",
+          context: {
+            jobTitle,
+            role: selectedRole,
+            notes: summary || "No notes yet, generate something professional",
+            skills: skills.join(", "),
+          },
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to generate summary");
+      setValue("summary", data.result, { shouldValidate: true });
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "AI assist failed");
     } finally {
       setIsAILoading(false);
     }
@@ -82,7 +112,7 @@ export function StepBasics() {
           Basic Information
         </h2>
         <p className="text-base text-gray-400 font-medium pb-2 border-b border-gray-800">
-          Let&apos;s start with your contact details and professional links.
+          Let&apos;s start with your contact details and professional profile.
         </p>
       </div>
 
@@ -95,7 +125,7 @@ export function StepBasics() {
           <div>
             <h4 className="text-white font-bold text-lg">AI Quick Start</h4>
             <p className="text-violet-200/70 text-sm leading-relaxed max-w-md">
-              Short on time? Enter your job title below and click here to have AI generate a high-quality base resume for you.
+              Short on time? Enter your job title below and click here to have AI generate a high-quality summary for you.
             </p>
           </div>
         </div>
@@ -109,6 +139,12 @@ export function StepBasics() {
           Magic Fill
         </button>
       </div>
+
+      {aiError && (
+        <div className="p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400">
+          {aiError}
+        </div>
+      )}
 
       <div className="mb-6">
         <label className="block text-sm font-semibold mb-3 text-gray-300">
@@ -202,6 +238,69 @@ export function StepBasics() {
           error={errors.portfolio?.message}
         />
       </div>
+
+      {/* Professional Summary — merged from StepSummary */}
+      <div className="pt-6 border-t border-gray-800 space-y-6">
+        <div>
+          <h3 className="text-2xl font-bold mb-1 text-white tracking-tight">
+            Professional Summary
+          </h3>
+          <p className="text-base font-medium text-gray-400">
+            Write a short, engaging pitch highlighting your expertise.
+          </p>
+        </div>
+
+        <div className="rounded-2xl p-5 flex gap-4 text-sm bg-purple-900/20 border border-purple-500/30 text-purple-200">
+          <Info className="w-6 h-6 shrink-0 text-purple-400" />
+          <p className="leading-relaxed">
+            <strong className="text-white">Tip:</strong> Just jot down rough notes or keywords, then click{" "}
+            <strong className="text-purple-300">✨ Write with AI</strong> and our AI will craft a polished summary for you!
+          </p>
+        </div>
+
+        <div className="relative">
+          <Textarea
+            label="Summary"
+            placeholder={
+              selectedRole === "student"
+                ? "I'm a Computer Science student passionate about web development and machine learning..."
+                : selectedRole === "fresher"
+                ? "Recent graduate with a strong foundation in software development, eager to contribute..."
+                : "Results-driven professional with 5+ years of experience in building scalable web applications..."
+            }
+            rows={6}
+            {...register("summary")}
+            error={errors.summary?.message}
+          />
+          <div
+            className={`absolute bottom-3 right-4 text-xs font-bold ${
+              summary.length < 10 ? "text-red-400" : summary.length > 2000 ? "text-red-400" : "text-gray-500"
+            }`}
+          >
+            {summary.length} / 2000
+          </div>
+        </div>
+
+        <button
+          type="button"
+          disabled={isAILoading}
+          className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-300 border border-violet-500/40 hover:border-violet-400 hover:text-white"
+          onClick={handleAISummary}
+        >
+          {isAILoading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Writing...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-5 h-5" />
+              ✨ Write with AI
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 }
+

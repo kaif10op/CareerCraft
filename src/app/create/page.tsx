@@ -1,7 +1,7 @@
 import ResumeForm from "@/components/ResumeForm";
 
 export const metadata = {
-  title: "Create Resume | Carrier Craft",
+  title: "Create Resume | CareerCraft",
   description: "Enter your details and let AI create a professional resume for you.",
 };
 

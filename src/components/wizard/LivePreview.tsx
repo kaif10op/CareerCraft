@@ -17,7 +17,7 @@ export function LivePreview() {
           {data.fullName || "Your Name"}
         </h1>
         {data.jobTitle && (
-          <h2 className="font-semibold text-lg text-brand-600 mb-3">
+          <h2 className="font-semibold text-lg text-violet-600 mb-3">
             {data.jobTitle}
           </h2>
         )}
@@ -76,7 +76,7 @@ export function LivePreview() {
               <div key={i}>
                 <div className="flex justify-between items-baseline mb-1">
                   <h4 className="font-bold text-[15px] text-gray-900">{exp.position}</h4>
-                  <span className="text-sm font-semibold whitespace-nowrap ml-4 text-brand-600">
+                  <span className="text-sm font-semibold whitespace-nowrap ml-4 text-violet-600">
                     {exp.startDate} {exp.startDate && exp.endDate ? "—" : ""} {exp.endDate}
                   </span>
                 </div>
@@ -107,7 +107,7 @@ export function LivePreview() {
                       {edu.degree} in {edu.field}
                     </h4>
                     <div className="text-sm font-medium text-gray-700 mt-0.5">{edu.institution}</div>
-                    <div className="text-xs font-medium mt-1 text-brand-600">
+                    <div className="text-xs font-medium mt-1 text-violet-600">
                       {edu.startYear} - {edu.endYear}
                     </div>
                   </div>
@@ -128,7 +128,7 @@ export function LivePreview() {
                   <div key={i}>
                     <h4 className="font-bold text-sm text-gray-900">{cert.name}</h4>
                     <div className="text-sm font-medium text-gray-700 mt-0.5">{cert.issuer}</div>
-                    <div className="text-xs font-medium mt-1 text-brand-600">{cert.date}</div>
+                    <div className="text-xs font-medium mt-1 text-violet-600">{cert.date}</div>
                   </div>
                 ))}
               </div>
@@ -149,7 +149,7 @@ export function LivePreview() {
                 <div className="flex items-baseline gap-3 mb-1.5">
                   <h4 className="font-bold text-[15px] text-gray-900">{proj.name}</h4>
                   {proj.techStack && (
-                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full text-brand-700 bg-brand-50 border border-brand-100">
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full text-violet-700 bg-violet-50 border border-violet-100">
                       {proj.techStack}
                     </span>
                   )}

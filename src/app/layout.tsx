@@ -11,10 +11,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Carrier Craft | Create Professional Resumes",
+  title: "CareerCraft | Create Professional Resumes",
   description:
     "Build stunning, ATS-optimized resumes in seconds using AI. Free, professional, and easy to use.",
-  keywords: ["resume builder", "Carrier Craft", "professional resume", "ATS-friendly"],
+  keywords: ["resume builder", "CareerCraft", "professional resume", "ATS-friendly"],
 };
 
 export default function RootLayout({

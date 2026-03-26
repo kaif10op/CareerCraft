@@ -14,21 +14,17 @@ import { toast } from "sonner";
 // Wizard Steps
 import { StepTemplate } from "./wizard/StepTemplate";
 import { StepBasics } from "./wizard/StepBasics";
-import { StepSummary } from "./wizard/StepSummary";
 import { StepExperience } from "./wizard/StepExperience";
-import { StepEducation } from "./wizard/StepEducation";
-import { StepProjects } from "./wizard/StepProjects";
+import { StepPortfolio } from "./wizard/StepPortfolio";
 import { StepSkills } from "./wizard/StepSkills";
 import { LivePreview } from "./wizard/LivePreview";
 import { AtsInsights } from "./wizard/AtsInsights";
 
 const ALL_STEPS = [
   { id: "template", title: "Design", fields: ["templateId"] },
-  { id: "basics", title: "Basics", fields: ["fullName", "email", "phone", "linkedin", "github", "portfolio", "location", "jobTitle", "role"] },
-  { id: "summary", title: "Summary", fields: ["summary"] },
+  { id: "basics", title: "Info & Summary", fields: ["fullName", "email", "phone", "linkedin", "github", "portfolio", "location", "jobTitle", "role", "summary"] },
   { id: "experience", title: "Experience", fields: ["experience"] },
-  { id: "education", title: "Education", fields: ["education", "certifications"] },
-  { id: "projects", title: "Projects", fields: ["projects"] },
+  { id: "portfolio", title: "Portfolio", fields: ["education", "certifications", "projects"] },
   { id: "skills", title: "Skills", fields: ["skills"] },
 ];
 
@@ -97,7 +93,7 @@ export default function ResumeForm() {
       return;
     }
 
-    if (currentStepId === "projects") {
+    if (currentStepId === "portfolio") {
       if (currentStep < STEPS.length - 1) {
         setCurrentStep((prev) => prev + 1);
         formContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -271,11 +267,9 @@ export default function ResumeForm() {
                 >
                   {currentStep === 0 && <StepTemplate />}
                   {currentStep === 1 && <StepBasics />}
-                  {currentStep === 2 && <StepSummary />}
-                  {currentStep === 3 && <StepExperience />}
-                  {currentStep === 4 && <StepEducation />}
-                  {currentStep === 5 && <StepProjects />}
-                  {currentStep === 6 && <StepSkills />}
+                  {currentStep === 2 && <StepExperience />}
+                  {currentStep === 3 && <StepPortfolio />}
+                  {currentStep === 4 && <StepSkills />}
                 </motion.div>
               </AnimatePresence>
             </div>

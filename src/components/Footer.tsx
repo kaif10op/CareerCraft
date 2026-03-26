@@ -74,7 +74,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} Carrier Craft. All rights reserved.
+            © {new Date().getFullYear()} CareerCraft. All rights reserved.
           </p>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <span>Built with</span>

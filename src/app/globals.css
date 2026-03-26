@@ -1,54 +1,6 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: var(--color-gray-50);
-  --color-brand-100: var(--color-gray-100);
-  --color-brand-200: var(--color-gray-200);
-  --color-brand-300: var(--color-gray-300);
-  --color-brand-400: var(--color-gray-400);
-  --color-brand-500: var(--color-gray-500);
-  --color-brand-600: var(--color-gray-600);
-  --color-brand-700: var(--color-gray-700);
-  --color-brand-800: var(--color-gray-800);
-  --color-brand-900: var(--color-gray-900);
-  --color-brand-950: var(--color-gray-950);
-
-  --color-violet-50: var(--color-gray-50);
-  --color-violet-100: var(--color-gray-100);
-  --color-violet-200: var(--color-gray-200);
-  --color-violet-300: var(--color-gray-300);
-  --color-violet-400: var(--color-gray-400);
-  --color-violet-500: var(--color-gray-500);
-  --color-violet-600: var(--color-gray-600);
-  --color-violet-700: var(--color-gray-700);
-  --color-violet-800: var(--color-gray-800);
-  --color-violet-900: var(--color-gray-900);
-  --color-violet-950: var(--color-gray-950);
-
-  --color-cyan-50: var(--color-gray-50);
-  --color-cyan-100: var(--color-gray-100);
-  --color-cyan-200: var(--color-gray-200);
-  --color-cyan-300: var(--color-gray-300);
-  --color-cyan-400: var(--color-gray-400);
-  --color-cyan-500: var(--color-gray-500);
-  --color-cyan-600: var(--color-gray-600);
-  --color-cyan-700: var(--color-gray-700);
-  --color-cyan-800: var(--color-gray-800);
-  --color-cyan-900: var(--color-gray-900);
-  --color-cyan-950: var(--color-gray-950);
-
-  --color-purple-50: var(--color-gray-50);
-  --color-purple-100: var(--color-gray-100);
-  --color-purple-200: var(--color-gray-200);
-  --color-purple-300: var(--color-gray-300);
-  --color-purple-400: var(--color-gray-400);
-  --color-purple-500: var(--color-gray-500);
-  --color-purple-600: var(--color-gray-600);
-  --color-purple-700: var(--color-gray-700);
-  --color-purple-800: var(--color-gray-800);
-  --color-purple-900: var(--color-gray-900);
-  --color-purple-950: var(--color-gray-950);
-  
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --animate-gradient: gradient-shift 3s ease infinite;
   --animate-shimmer: shimmer 2s infinite;
@@ -73,8 +25,8 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(75, 85, 99, 0.3); }
-    50% { box-shadow: 0 0 16px 4px rgba(75, 85, 99, 0.15); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.3); }
+    50% { box-shadow: 0 0 16px 4px rgba(139, 92, 246, 0.15); }
   }
 
   @keyframes float {
@@ -102,8 +54,26 @@ html {
 
 body {
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background-color: #030712; /* gray-950 */
   color: #f9fafb; /* gray-50 */
+}
+
+/* Text Selection — violet accent */
+::selection {
+  background: rgba(139, 92, 246, 0.35);
+  color: #fff;
+}
+::-moz-selection {
+  background: rgba(139, 92, 246, 0.35);
+  color: #fff;
+}
+
+/* Focus Styles — consistent violet ring */
+*:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.6);
+  outline-offset: 2px;
+  border-radius: 8px;
 }
 
 /* Custom Scrollbar */
@@ -118,7 +88,7 @@ body {
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
+  background: #6d28d9;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -135,10 +105,53 @@ body {
   background: #374151;
 }
 
+/* Animation delays */
 .delay-1000 {
   animation-delay: 1s;
 }
 
+/* AI Button shimmer effect */
+.ai-btn {
+  position: relative;
+  overflow: hidden;
+}
+.ai-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(139, 92, 246, 0.08) 50%,
+    transparent 100%
+  );
+  transform: rotate(30deg);
+  animation: btn-shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes btn-shimmer {
+  0% { transform: translateX(-100%) rotate(30deg); }
+  100% { transform: translateX(100%) rotate(30deg); }
+}
+
+/* Input field focus animation */
+input:focus, textarea:focus {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Smooth page transitions */
+main {
+  animation: page-in 0.3s ease-out;
+}
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Print Styles */
 @media print {
   * {
     -webkit-print-color-adjust: exact !important;
@@ -147,7 +160,6 @@ body {
   html, body {
     background: white !important;
     color: black !important;
-    /* Prevent printing blank pages at the end */
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
@@ -161,9 +173,9 @@ body {
     padding: 0 !important;
     background: white !important;
     margin: 0 !important;
+    animation: none !important;
   }
   
-  /* Prevent awkward page breaks */
   h1, h2, h3, h4, h5, h6 {
     page-break-after: avoid;
     break-after: avoid;
@@ -174,10 +186,9 @@ body {
     break-inside: avoid;
   }
   
-  /* Ensure the resume container fits nicely */
   #resume-content {
     box-shadow: none !important;
-    padding: 0.5in !important; /* Replace paper margins with container padding */
+    padding: 0.5in !important;
     margin: 0 !important;
     max-width: 100% !important;
     width: 100% !important;
@@ -188,5 +199,6 @@ body {
 
 @page {
   size: auto;
-  margin: 0mm; /* Removes the browser header/footer (date, url) */
+  margin: 0mm;
 }
+

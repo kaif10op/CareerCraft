@@ -23,14 +23,14 @@ export default function PreviewPage() {
 
   useEffect(() => {
     try {
-      supabase.auth.getSession().then(({ data: { session } }) => {
+      supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
         setUser(session?.user ?? null);
       }).catch(() => setUser(null));
     } catch { setUser(null); }
 
     let subscription: any;
     try {
-      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      const { data } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
         setUser(session?.user ?? null);
       });
       subscription = data?.subscription;

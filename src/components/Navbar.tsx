@@ -19,14 +19,14 @@ export default function Navbar() {
   useEffect(() => {
     // Get initial session
     try {
-      supabase.auth.getSession().then(({ data: { session }, error }) => {
+      supabase.auth.getSession().then(({ data: { session }, error }: { data: { session: any }, error: any }) => {
         if (error) {
           console.warn("Auth session error:", error.message);
           setUser(null);
         } else {
           setUser(session?.user ?? null);
         }
-      }).catch(err => {
+      }).catch((err: any) => {
         console.warn("Caught Supabase fetch error in getSession:", err);
         setUser(null);
       });
@@ -38,7 +38,7 @@ export default function Navbar() {
     // Listen for auth changes
     let subscription: any;
     try {
-      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      const { data } = supabase.auth.onAuthStateChange((event: any, session: any) => {
         setUser(session?.user ?? null);
         if (event === 'SIGNED_OUT') {
           router.push('/');

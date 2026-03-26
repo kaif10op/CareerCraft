@@ -10,8 +10,20 @@ interface StepperProps {
 }
 
 export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
+  const progressPercent = Math.round((currentStep / (steps.length - 1)) * 100);
+
   return (
     <div className="w-full">
+      {/* Progress header */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-semibold text-gray-400">
+          Step {currentStep + 1} of {steps.length}
+        </span>
+        <span className="text-xs font-bold text-violet-400">
+          {progressPercent}% complete
+        </span>
+      </div>
+
       {/* Step circles + progress bar */}
       <div className="flex items-center justify-between relative mb-2">
         {/* Background Track */}
@@ -47,15 +59,15 @@ export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
                 }}
                 initial={false}
                 animate={{
-                  backgroundColor: isCompleted || isCurrent ? "#8b5cf6" : "#1f2937",
-                  borderColor: isCompleted || isCurrent ? "#8b5cf6" : "#374151",
-                  scale: isCurrent ? 1.1 : 1,
+                  backgroundColor: isCompleted ? "#7c3aed" : isCurrent ? "#8b5cf6" : "#1f2937",
+                  borderColor: isCompleted ? "#7c3aed" : isCurrent ? "#8b5cf6" : "#374151",
+                  scale: isCurrent ? 1.15 : 1,
                 }}
                 className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${
-                  isCompleted || isCurrent ? "cursor-pointer" : "cursor-not-allowed opacity-70"
-                }`}
+                  isCompleted || isCurrent ? "cursor-pointer" : "cursor-pointer opacity-70 hover:opacity-100"
+                } transition-opacity`}
                 style={{
-                  boxShadow: isCurrent ? "0 4px 14px rgba(139, 92, 246, 0.3)" : "none",
+                  boxShadow: isCurrent ? "0 4px 14px rgba(139, 92, 246, 0.4)" : "none",
                 }}
               >
                 {isCompleted ? (
@@ -86,7 +98,7 @@ export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
             <span
               key={step.id}
               onClick={() => {
-                if ((isCompleted || isCurrent) && onStepClick) {
+                if (onStepClick) {
                   onStepClick(index);
                 }
               }}
@@ -106,3 +118,4 @@ export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
     </div>
   );
 }
+

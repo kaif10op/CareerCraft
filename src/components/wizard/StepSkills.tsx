@@ -5,6 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { ResumeFormValues } from "@/lib/schema";
 import { X, Code2, Sparkles, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AICareerTools } from "./AICareerTools";
 
 export function StepSkills() {
   const {
@@ -203,6 +204,10 @@ export function StepSkills() {
           )}
         </div>
       </div>
+      
+      {/* AI Career Tools directly below skills */}
+      <AICareerTools />
     </div>
   );
 }
+

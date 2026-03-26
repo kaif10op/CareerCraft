@@ -8,7 +8,7 @@ export default function FaqSection() {
 
   const faqs = [
     {
-      question: "Is Carrier Craft truly 100% free?",
+      question: "Is CareerCraft truly 100% free?",
       answer: "Yes! There are no hidden fees, paywalls, or subscriptions. You can create, edit, and download your ATS-optimized resume in PDF format completely free of charge."
     },
     {

@@ -16,7 +16,7 @@ export interface AIAssistContext {
 }
 
 export interface AIAssistRequest {
-    type: "summary" | "experience" | "skills" | "projects" | "certifications" | "job_titles";
+    type: "summary" | "experience" | "skills" | "projects" | "certifications" | "job_titles" | "cover_letter" | "resume_review" | "interview_prep";
     context: AIAssistContext;
 }
 
@@ -53,7 +53,7 @@ const providers: AIProvider[] = [
             Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
             "Content-Type": "application/json",
             "HTTP-Referer": "https://carrier-craft.vercel.app",
-            "X-Title": "Carrier Craft",
+            "X-Title": "CareerCraft",
         }),
         model: "meta-llama/llama-3.3-70b-instruct:free",
     },
@@ -81,6 +81,12 @@ export function buildSystemPrompt(type: string): string {
             return "You are a career counselor. Based on the user's field and title, suggest 5 highly recognized industry certifications they could add. Output ONLY a comma-separated list of certification names.";
         case "job_titles":
             return "You are a career consultant. Suggest 5 modern, professional job titles that fit the candidate's role and background. Output ONLY a comma-separated list of titles.";
+        case "cover_letter":
+            return "You are a professional career writer. Write a concise, compelling cover letter (3-4 paragraphs) that complements the candidate's resume. Be specific about the candidate's value, use a professional but warm tone. Output ONLY the letter body text — no 'Dear Hiring Manager' or sign-off.";
+        case "resume_review":
+            return "You are a senior career coach and ATS expert. Review the resume data and provide exactly 5 specific, actionable improvement suggestions. Be direct — start each suggestion with an action verb. Focus on concrete changes that increase interview rates. Format: number each suggestion on its own line (1. 2. 3. etc).";
+        case "interview_prep":
+            return "You are an interview preparation expert. Based on the candidate's resume data, generate 5 likely interview questions they would face, each with a brief coaching tip (one sentence). Format each as 'Q: [question]\nTip: [coaching note]' separated by blank lines.";
         default:
             return "You are a helpful career advisor.";
     }
@@ -120,6 +126,28 @@ Field/Industry: ${context.field || context.jobTitle || "Professional"}`;
         case "job_titles":
             return `Brainstorm 5 job titles for a candidate who identifies as: ${context.role}. 
 They currently listed their target title as: ${context.jobTitle || "None yet"}`;
+
+        case "cover_letter":
+            return `Write a cover letter body for this candidate:
+Job Title: ${context.jobTitle || "Not specified"}
+Role Type: ${context.role || "Professional"}
+Key Skills: ${context.skills || "Not specified"}
+Summary: ${context.notes || "Not provided"}
+Target Company/Role: ${context.company || "General application"}`;
+
+        case "resume_review":
+            return `Review this resume and give 5 improvement suggestions:
+Job Title: ${context.jobTitle || "Not specified"}
+Summary: ${context.notes || "No summary"}
+Experience: ${context.description || "Not detailed"}
+Skills: ${context.skills || "Not listed"}`;
+
+        case "interview_prep":
+            return `Generate 5 interview questions with coaching tips for:
+Job Title: ${context.jobTitle || "Not specified"}
+Industry/Role: ${context.role || "Professional"}
+Key Skills: ${context.skills || "Not specified"}
+Experience Summary: ${context.description || "Not detailed"}`;
 
         default:
             return JSON.stringify(context);

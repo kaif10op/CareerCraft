@@ -33,7 +33,7 @@ const providers: AIProvider[] = [
       Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
       "HTTP-Referer": "https://carrier-craft.vercel.app",
-      "X-Title": "Carrier Craft",
+      "X-Title": "CareerCraft",
     }),
     model: process.env.AI_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
   },

@@ -143,7 +143,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
                   >
                     {mode === "login"
                       ? "Sign in to access your saved resumes"
-                      : "Join Carrier Craft to save your masterpieces"}
+                      : "Join CareerCraft to save your masterpieces"}
                   </motion.p>
                 </div>
 

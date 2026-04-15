@@ -344,7 +344,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-violet-400 transition-colors" />
                         <input
                           type="password"
-                          required={mode !== "reset"}
+                          required
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"

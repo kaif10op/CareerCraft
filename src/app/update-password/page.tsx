@@ -20,7 +20,7 @@ export default function UpdatePasswordPage() {
   useEffect(() => {
     // Supabase auth-js automatically extracts the session from the URL hash 
     // when a user clicks the password reset link
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabase.auth.onAuthStateChange((event: any, session: any) => {
       // The event for password recovery is PASSWORD_RECOVERY
       // But we just need a valid session to be able to update the password
       if (session) {
@@ -28,7 +28,7 @@ export default function UpdatePasswordPage() {
       } else {
         // Give the library a moment to parse the URL hash
         setTimeout(() => {
-          supabase.auth.getSession().then(({ data }) => {
+          supabase.auth.getSession().then(({ data }: any) => {
             if (!data.session) {
               setError("Invalid or expired password reset link. Please request a new one.");
             }
